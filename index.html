@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我們的約會足跡 (最終修正版)</title>
+    <title>我們的約會足跡 (排序功能版)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -123,13 +123,12 @@
         .tab-btn.boy.active { background: #dbeafe; color: #2563eb; }
         .tab-btn.girl.active { background: #ffe4e6; color: #e11d48; }
 
-        /* 搜尋控制項 CSS 優化 */
+        /* 搜尋控制項 */
         .leaflet-control-geocoder {
             border-radius: 6px !important;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
             border: 2px solid #fff !important;
         }
-        /* 調整搜尋按鈕(黑色放大鏡)的大小與位置 */
         .leaflet-control-geocoder-icon {
             border-radius: 4px !important;
             width: 30px !important;
@@ -174,12 +173,26 @@
         
         <!-- 左側：列表區 -->
         <aside class="w-full md:w-1/3 lg:w-1/4 flex flex-col h-[40%] md:h-full">
-            <div class="pb-3 px-2 flex justify-between items-end border-b-2 border-slate-200">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-images text-themeMain"></i>
-                    <h2 class="font-bold text-slate-700 text-base">回憶相簿</h2>
+            <div class="pb-3 px-2 border-b-2 border-slate-200">
+                <!-- 標題與計數 -->
+                <div class="flex justify-between items-end mb-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-images text-themeMain"></i>
+                        <h2 class="font-bold text-slate-700 text-base">回憶相簿</h2>
+                    </div>
+                    <span class="text-xs bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-bold" id="count-display">0</span>
                 </div>
-                <span class="text-xs bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-bold" id="count-display">0</span>
+                
+                <!-- 排序選單 -->
+                <div class="relative">
+                    <select onchange="changeSort(this.value)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 text-slate-600 focus:outline-none focus:border-themeMain cursor-pointer appearance-none font-medium">
+                        <option value="date">📅 依約會日期 (新 → 舊)</option>
+                        <option value="created">✨ 依新增順序 (新 → 舊)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </div>
+                </div>
             </div>
             
             <div id="location-list" class="flex-1 overflow-y-auto p-0 space-y-0 no-scrollbar pb-10 mt-2">
@@ -269,6 +282,7 @@
         let markers = [];
         let spots = [];
         let currentTab = 'boy';
+        let currentSort = 'date'; // 預設排序模式
 
         function switchTab(gender) {
             currentTab = gender;
@@ -283,6 +297,12 @@
                 boyBtn.classList.remove('active'); girlBtn.classList.add('active');
                 boyPanel.classList.add('hidden'); girlPanel.classList.remove('hidden');
             }
+        }
+
+        // 切換排序模式
+        function changeSort(mode) {
+            currentSort = mode;
+            renderAll();
         }
 
         async function fetchData() {
@@ -320,11 +340,8 @@
                 attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 20
             }).addTo(map);
 
-            // 搜尋功能初始化 (移除 Emoji)
             L.Control.geocoder({
-                defaultMarkGeocode: false, 
-                placeholder: '搜尋地點...', // <--- 這裡改回純文字，解決重複圖示問題
-                errorMessage: '找不到地點'
+                defaultMarkGeocode: false, placeholder: '搜尋地點...', errorMessage: '找不到地點'
             })
             .on('markgeocode', function(e) { map.flyTo(e.geocode.center, 16); })
             .addTo(map);
@@ -350,7 +367,18 @@
 
             if (spots.length === 0) listContainer.innerHTML = `<div class="p-10 text-center text-slate-300">尚無回憶</div>`;
 
-            const sortedSpots = [...spots].sort((a, b) => new Date(b.date) - new Date(a.date));
+            // 根據 currentSort 進行排序
+            // 注意：我們使用 [...spots] 複製一份陣列，避免修改到原始資料順序
+            let sortedSpots = [...spots];
+            
+            if (currentSort === 'date') {
+                // 依日期 (新到舊)
+                sortedSpots.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else if (currentSort === 'created') {
+                // 依 ID (建立時間，新到舊)
+                // ID 是 timestamp 生成的，所以數值越大越新
+                sortedSpots.sort((a, b) => Number(b.id) - Number(a.id));
+            }
 
             sortedSpots.forEach(spot => {
                 const popupContent = `
