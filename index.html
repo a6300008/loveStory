@@ -3,8 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我們的約會足跡 (排序功能版)</title>
     
+    <!-- 設定網頁標題 -->
+    <title>Our Love Map 📍 Mapping Every Date & Memory Together</title>
+    
+    <!-- 設定網頁描述 (SEO Description) -->
+    <meta name="description" content="不想忘記和你一起度過的任何一個午後。這是一個只屬於我們兩人的地圖，紀錄那些一起散步、一起吃飯、一起發呆的小日子。我們的故事，未完待續。">
+
+    <meta property="og:title" content="Our Love Map 📍 Mapping Every Date & Memory Together" />
+    <meta property="og:description" content="不想忘記和你一起度過的任何一個午後。這是一個只屬於我們兩人的地圖，紀錄那些一起散步、一起吃飯、一起發呆的小日子。我們的故事，未完待續。" />
+    <meta property="og:image" content="fbshare.png" />
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -282,7 +295,7 @@
         let markers = [];
         let spots = [];
         let currentTab = 'boy';
-        let currentSort = 'date'; // 預設排序模式
+        let currentSort = 'date'; 
 
         function switchTab(gender) {
             currentTab = gender;
@@ -299,7 +312,6 @@
             }
         }
 
-        // 切換排序模式
         function changeSort(mode) {
             currentSort = mode;
             renderAll();
@@ -341,7 +353,9 @@
             }).addTo(map);
 
             L.Control.geocoder({
-                defaultMarkGeocode: false, placeholder: '搜尋地點...', errorMessage: '找不到地點'
+                defaultMarkGeocode: false, 
+                placeholder: '搜尋地點...', 
+                errorMessage: '找不到地點'
             })
             .on('markgeocode', function(e) { map.flyTo(e.geocode.center, 16); })
             .addTo(map);
@@ -367,16 +381,11 @@
 
             if (spots.length === 0) listContainer.innerHTML = `<div class="p-10 text-center text-slate-300">尚無回憶</div>`;
 
-            // 根據 currentSort 進行排序
-            // 注意：我們使用 [...spots] 複製一份陣列，避免修改到原始資料順序
             let sortedSpots = [...spots];
             
             if (currentSort === 'date') {
-                // 依日期 (新到舊)
                 sortedSpots.sort((a, b) => new Date(b.date) - new Date(a.date));
             } else if (currentSort === 'created') {
-                // 依 ID (建立時間，新到舊)
-                // ID 是 timestamp 生成的，所以數值越大越新
                 sortedSpots.sort((a, b) => Number(b.id) - Number(a.id));
             }
 
