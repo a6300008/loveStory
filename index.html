@@ -9,15 +9,18 @@
     
     <!-- 設定網頁描述 (SEO Description) -->
     <meta name="description" content="不想忘記和你一起度過的任何一個午後。這是一個只屬於我們兩人的地圖，紀錄那些一起散步、一起吃飯、一起發呆的小日子。我們的故事，未完待續。">
-
+    
+    <!-- Open Graph / Facebook 分享設定 -->
     <meta property="og:title" content="Our Love Map 📍 Mapping Every Date & Memory Together" />
     <meta property="og:description" content="不想忘記和你一起度過的任何一個午後。這是一個只屬於我們兩人的地圖，紀錄那些一起散步、一起吃飯、一起發呆的小日子。我們的故事，未完待續。" />
     <meta property="og:image" content="https://a6300008.github.io/loveStory/fbshare.png" />
     
+    <!-- Favicon / 網站圖示設定 -->
     <link rel="apple-touch-icon" sizes="180x180" href="https://a6300008.github.io/loveStory/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="https://a6300008.github.io/loveStory/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://a6300008.github.io/loveStory/favicon-16x16.png">
     <link rel="manifest" href="https://a6300008.github.io/loveStory/site.webmanifest">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -167,7 +170,12 @@
                     <div class="bg-sky-100 p-2 rounded-full">
                         <i class="fa-solid fa-heart text-themeMain text-xl"></i>
                     </div>
-                    <h1 class="text-lg sm:text-xl font-bold tracking-wide text-slate-700 font-cute">Our Dating Map</h1>
+                    <!-- 標題更新處 -->
+                    <h1 class="text-lg sm:text-xl font-bold tracking-wide text-slate-700 font-cute flex items-baseline gap-2">
+                        Our Love Map
+                        <!-- 副標題：手機隱藏，電腦顯示 -->
+                        <span class="hidden md:inline text-xs sm:text-sm font-normal text-slate-500">📍 Mapping Every Date & Memory Together</span>
+                    </h1>
                 </div>
                 <div>
                     <button onclick="fetchData()" class="text-xs sm:text-sm bg-slate-100 px-4 py-2 rounded-full hover:bg-sky-100 hover:text-sky-600 text-slate-500 transition shadow-sm font-bold">
