@@ -51,15 +51,10 @@
         }
         .heart-marker:hover { transform: scale(1.25); }
         
-        /* 確保 Icon 容器大小固定且置中 */
         .heart-icon-div {
-            width: 34px !important;
-            height: 34px !important;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
+            width: 34px !important; height: 34px !important;
+            display: flex !important; align-items: center; justify-content: center;
+            background: transparent; border: none;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -232,47 +227,30 @@
             renderAll();
         }
 
-        window.toggleExpand = function(btn) {
-            const p = btn.previousElementSibling;
-            p.classList.toggle('line-clamp-2');
-            if (p.classList.contains('line-clamp-2')) {
-                btn.innerHTML = '展開 <i class="fa-solid fa-chevron-down ml-0.5"></i>';
-            } else {
-                btn.innerHTML = '收起 <i class="fa-solid fa-chevron-up ml-0.5"></i>';
-            }
-        };
-
-        // ★★★ 核心邏輯修正：確保移動完才開啟 Popup ★★★
-        // 新增了 setTimeout 延遲與 popupopen 更新機制
         function flyToSpot(lat, lng, callback) {
             const targetZoom = 16;
             const mapHeight = map.getSize().y;
             
-            // 1. 強制關閉所有 popup
+            // 強制關閉 (避免錯位)
             map.closePopup();
 
-            // 2. 計算目標點 (75% Top)
             const point = map.project([lat, lng], targetZoom);
             const targetPoint = L.point(point.x, point.y - (mapHeight * 0.25)); 
             const newCenter = map.unproject(targetPoint, targetZoom);
             
-            // 3. 檢查距離 (若太近直接開，避免等待動畫)
             const currentCenter = map.getCenter();
             const dist = map.distance(currentCenter, newCenter);
             
+            // 距離很近，直接開
             if (dist < 50) {
                 if (callback) callback();
                 return;
             }
 
-            // 4. 執行飛行
             map.flyTo(newCenter, targetZoom, { animate: true, duration: 0.6 });
             
-            // 5. 監聽 'moveend' 事件，確認完全停止後才執行 callback
             map.once('moveend', function() {
-                if (callback) {
-                    setTimeout(callback, 50); // 微小延遲確保 DOM 準備好
-                }
+                setTimeout(() => { if (callback) callback(); }, 150);
             });
         }
 
@@ -306,9 +284,6 @@
 
         function initMap() {
             map = L.map('map').setView([25.07, 121.51], 12);
-            // 當地圖初始化完成時，強制重新計算尺寸，防止 CSS 載入延遲導致的問題
-            map.invalidateSize();
-
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 20
             }).addTo(map);
@@ -318,29 +293,16 @@
 
             map.on('click', onMapClick);
             
-            // ★★★ 關鍵修復：當 Popup 打開時，強制觸發一次更新，校正位置 ★★★
+            // Popup 打開時強制校正位置
             map.on('popupopen', function(e) {
                 const popup = e.popup;
-                // 使用 setTimeout 確保在瀏覽器繪製完畢後再校正
-                setTimeout(() => {
-                    popup.update();
-                }, 10);
-
-                // 處理展開按鈕顯示邏輯
-                const popupNode = popup.getElement();
-                const texts = popupNode.querySelectorAll('.expand-text');
-                texts.forEach(p => {
-                    if (p.scrollHeight > p.clientHeight) {
-                        p.nextElementSibling.classList.remove('hidden');
-                    }
-                });
+                setTimeout(() => { popup.update(); }, 10);
             });
 
             fetchData();
         }
 
         function getHeartIcon() {
-            // Anchor 設定修正：確保尖端對準
             return L.divIcon({ className: 'heart-icon-div', html: '<i class="fa-solid fa-heart heart-marker"></i>', iconSize: [34, 34], iconAnchor: [17, 32], popupAnchor: [0, -36] });
         }
 
@@ -358,6 +320,7 @@
             else if (currentSort === 'created') { sortedSpots.sort((a, b) => Number(b.id) - Number(a.id)); }
 
             sortedSpots.forEach(spot => {
+                // UI: 移除了 onclick 互動，文字直接顯示完整
                 const popupContent = `
                     <div class="font-sans w-[280px] p-3 bg-white relative">
                         <div class="mb-2 border-b border-slate-100 pb-2 pr-24">
@@ -372,36 +335,30 @@
                             <button onclick="editSpot(${spot.id})" class="w-6 h-6 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-sky-50 hover:text-sky-500 transition" title="編輯"><i class="fa-solid fa-pen text-[10px]"></i></button>
                         </div>
 
-                        <div class="space-y-1.5 mb-2 max-h-[140px] overflow-y-auto custom-scroll pr-1">
+                        <div class="space-y-1.5 mb-2 max-h-[200px] overflow-y-auto custom-scroll pr-1">
                             <div class="flex gap-1.5 items-start">
                                 <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div>
-                                <div class="bg-blue-50 rounded-lg rounded-tl-none px-2 py-2 text-[13px] text-slate-600 flex-1 border border-blue-100 shadow-sm flex flex-col items-start">
-                                    <p class="break-words !m-0 whitespace-pre-line line-clamp-2 expand-text transition-all duration-300">${spot.note_boy || '...'}</p>
-                                    <button onclick="toggleExpand(this)" class="text-[10px] text-blue-400 mt-1 hover:text-blue-600 hidden font-bold self-end">展開 <i class="fa-solid fa-chevron-down ml-0.5"></i></button>
+                                <div class="bg-blue-50 rounded-lg rounded-tl-none px-2 py-2 text-[13px] text-slate-600 flex-1 border border-blue-100 shadow-sm">
+                                    <p class="break-words !m-0 whitespace-pre-line transition-all duration-300">${spot.note_boy || '...'}</p>
                                 </div>
                             </div>
                             <div class="flex gap-1.5 items-start flex-row-reverse">
                                 <div class="w-5 h-5 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div>
-                                <div class="bg-pink-50 rounded-lg rounded-tr-none px-2 py-2 text-[13px] text-slate-600 flex-1 border border-pink-100 shadow-sm text-right flex flex-col items-end">
-                                    <p class="break-words !m-0 text-left whitespace-pre-line line-clamp-2 expand-text transition-all duration-300">${spot.note_girl || '...'}</p>
-                                    <button onclick="toggleExpand(this)" class="text-[10px] text-pink-400 mt-1 hover:text-pink-600 hidden font-bold self-start">展開 <i class="fa-solid fa-chevron-down ml-0.5"></i></button>
+                                <div class="bg-pink-50 rounded-lg rounded-tr-none px-2 py-2 text-[13px] text-slate-600 flex-1 border border-pink-100 shadow-sm text-right">
+                                    <p class="break-words !m-0 text-left whitespace-pre-line transition-all duration-300">${spot.note_girl || '...'}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
 
-                // ★ 重點修正：
-                // 1. autoPan: false
-                // 2. 移除 click 預設行為
-                // 3. 自定義 click -> 呼叫 flyToSpot -> 完成後才 openPopup
+                // 保持穩定版：同步飛行
                 const marker = L.marker([spot.lat, spot.lng], { icon: getHeartIcon() })
                     .addTo(map)
                     .bindPopup(popupContent, { maxWidth: 320, minWidth: 280, autoPan: false });
                 
-                marker.off('click'); // 移除預設
+                marker.off('click');
                 marker.on('click', function() {
-                    // 傳入 callback: 當移動結束時，才執行 this.openPopup()
                     flyToSpot(spot.lat, spot.lng, () => {
                         this.openPopup();
                     });
