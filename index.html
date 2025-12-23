@@ -2,13 +2,12 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Our Love Map 📍 Mapping Every Date & Memory Together</title>
     <meta name="description" content="不想忘記和你一起度過的任何一個午後。這是一個只屬於我們兩人的地圖，紀錄那些一起散步、一起吃飯、一起發呆的小日子。我們的故事，未完待續。">
     
     <meta property="og:title" content="Our Love Map 📍 Mapping Every Date & Memory Together" />
-    <meta property="og:description" content="不想忘記和你一起度過的任何一個午後。這是一個只屬於我們兩人的地圖，紀錄那些一起散步、一起吃飯、一起發呆的小日子。我們的故事，未完待續。" />
     <meta property="og:image" content="https://a6300008.github.io/loveStory/fbshare.png" />
     
     <link rel="apple-touch-icon" sizes="180x180" href="https://a6300008.github.io/loveStory/apple-touch-icon.png">
@@ -16,20 +15,23 @@
     <link rel="icon" type="image/png" sizes="16x16" href="https://a6300008.github.io/loveStory/favicon-16x16.png">
     <link rel="manifest" href="https://a6300008.github.io/loveStory/site.webmanifest">
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        themeLight: '#e0f2fe', 
                         themeMain: '#38bdf8',  
-                        themeDark: '#0ea5e9',
+                        themePink: '#f43f5e',
                     },
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
@@ -41,154 +43,274 @@
     </script>
 
     <style>
-        body { background-color: #f0f9ff; height: 100vh; display: flex; flex-direction: column; }
-        #map { height: 100%; width: 100%; z-index: 1; border-radius: 0.5rem; border: 4px solid #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        body { background-color: #f0f9ff; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+        
+        #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; width: 100%; height: 100%; background: #e5e5e5; }
         
         .heart-marker {
-            color: #f43f5e; font-size: 34px;
-            filter: drop-shadow(0 3px 2px rgba(0,0,0,0.2));
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #f43f5e; font-size: 38px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .heart-marker:hover { transform: scale(1.25); }
-        
+        .heart-marker:hover { transform: scale(1.3) translateY(-5px); }
         .heart-icon-div {
-            width: 34px !important; height: 34px !important;
+            width: 38px !important; height: 38px !important;
             display: flex !important; align-items: center; justify-content: center;
             background: transparent; border: none;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 2000; align-items: center; justify-content: center; }
         
-        .cute-card {
-            background: white; border: 1px solid #e2e8f0;
-            transition: all 0.25s ease-out; position: relative; overflow: hidden;
-            border-radius: 0.5rem; margin-bottom: 0;
-        }
-        @media (min-width: 768px) { .cute-card { border-radius: 0; margin-bottom: -1px; } }
+        .search-scroll::-webkit-scrollbar { width: 4px; }
+        .search-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .search-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
+        #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; }
+
+        .leaflet-popup-content-wrapper { padding: 0; border-radius: 16px; box-shadow: 0 20px 40px -5px rgba(0,0,0,0.2); overflow: hidden; }
+        .leaflet-popup-content { margin: 0 !important; width: 100% !important; }
+        .leaflet-popup-content p { margin: 0 !important; }
+        .leaflet-container a.leaflet-popup-close-button { top: 12px; right: 12px; color: #94a3b8; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 50%; z-index: 20; }
+
+        /* --- 響應式佈局邏輯 --- */
+        
+        /* 手機版：懸浮列表 (Floating Sheet) */
+        .mobile-sheet {
+            position: absolute;
+            /* 修改：移除 top: 75%，改為固定 height: 225px */
+            height: 225px; 
+            left: 20px; right: 20px; bottom: 20px;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: none;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 20;
+            display: flex; flex-direction: column;
+            transition: height 0.3s ease; /* 改為 transition height */
+        }
+
+        /* 控制器 (Bottom Pill) */
+        #mobile-controls {
+            position: absolute; 
+            /* 修改：預設位置為 20px(bottom) + 225px(sheet) + 20px(gap) = 265px */
+            bottom: 265px;
+            left: 50%; transform: translateX(-50%);
+            z-index: 40; 
+            display: flex; align-items: center; 
+            gap: 12px; 
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px);
+            border-radius: 999px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border: 1px solid rgba(200,200,200,0.4); 
+            transition: all 0.3s ease-out;
+            min-width: 220px;
+            justify-content: space-between;
+        }
+        /* 控制器隱藏狀態 */
+        #mobile-controls.hidden-fade {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(20px);
+        }
+
+        #mobile-controls button {
+            width: 40px; height: 40px; border-radius: 999px;
+            display: flex; align-items: center; justify-content: center;
+            color: #475569; 
+            font-size: 18px; 
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        #mobile-controls button:hover { 
+            background-color: #f1f5f9; 
+            color: #38bdf8;
+        }
+        #mobile-controls .divider { width: 1px; height: 28px; background: #e2e8f0; margin: 0; }
+        
+        /* 搜尋框樣式 */
+        #custom-search-wrapper {
+            max-width: 0; opacity: 0; overflow: hidden;
+            transition: max-width 0.3s ease-out, opacity 0.2s ease-out;
+            display: flex; align-items: center;
+        }
+        #custom-search-wrapper.expanded {
+            max-width: 240px;
+            opacity: 1;
+        }
+        #custom-search-input {
+            width: 100%; height: 36px; background: transparent; 
+            color: #334155; 
+            border: none; outline: none; padding: 0 8px 0 4px; font-size: 15px;
+        }
+        #custom-search-input::placeholder { color: #94a3b8; }
+
+        /* 搜尋結果列表 */
+        #search-results {
+            position: absolute; 
+            bottom: 100%; left: 0; width: 100%; 
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(10px);
+            border-radius: 12px; border: 1px solid #e2e8f0;
+            max-height: 250px; overflow-y: auto; display: none;
+            padding: 4px 0; color: #334155;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 50;
+        }
+        #search-results li {
+            padding: 12px 16px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
+            line-height: 1.4;
+        }
+        #search-results li:last-child { border-bottom: none; }
+        #search-results li:hover { background: #f0f9ff; color: #38bdf8; }
+
+        .controls-group { display: flex; align-items: center; gap: 12px; overflow: hidden; max-width: 200px; transition: max-width 0.3s ease; }
+        .controls-group.hidden-force { max-width: 0; opacity: 0; pointer-events: none; }
+
+        /* 卡片樣式 */
+        .cute-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            transition: all 0.25s ease-out;
+            position: relative; 
+            overflow: hidden;
+            border-radius: 0.75rem; 
+        }
         .cute-card:hover { background-color: #f0f9ff; border-color: #bae6fd; z-index: 10; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
         .cute-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #e2e8f0; transition: all 0.25s ease; }
         .cute-card:hover::before { width: 6px; background: #38bdf8; }
 
-        .leaflet-popup-content-wrapper { padding: 0; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); overflow: hidden; }
-        .leaflet-popup-content { margin: 0 !important; width: 100% !important; }
-        .leaflet-popup-content p { margin: 0 !important; }
-        .leaflet-container a.leaflet-popup-close-button { top: 10px; right: 10px; color: #94a3b8; font-size: 18px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: transparent; border-radius: 50%; z-index: 20; }
-        .leaflet-container a.leaflet-popup-close-button:hover { color: #64748b; background: #f1f5f9; }
-        
-        .tab-btn { transition: all 0.2s; border-radius: 99px; }
-        .tab-btn.active { font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .tab-btn.boy.active { background: #dbeafe; color: #2563eb; }
-        .tab-btn.girl.active { background: #ffe4e6; color: #e11d48; }
-
-        .leaflet-control-geocoder { border-radius: 6px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important; border: 2px solid #fff !important; }
-        .leaflet-control-geocoder-icon { border-radius: 4px !important; width: 30px !important; height: 30px !important; }
+        @media (min-width: 768px) {
+            .mobile-sheet {
+                position: static; top: auto; bottom: auto; left: auto; right: auto;
+                width: 25%; height: 100%; /* 電腦版恢復高度 */
+                background: white; 
+                border-radius: 0; box-shadow: none; border-right: 1px solid #e2e8f0; z-index: 20;
+                margin: 0; overflow: hidden;
+            }
+            .mobile-sheet > div:first-child { display: none; }
+            #map-container { position: relative; width: 75%; height: 100%; }
+            #map { position: relative; }
+            #mobile-controls { bottom: 24px; left: 50%; transform: translateX(-50%); }
+        }
     </style>
 </head>
-<body class="text-slate-600 font-sans overflow-hidden selection:bg-sky-200">
+<body class="text-slate-600 font-sans">
 
     <div id="loading-overlay" class="hidden flex">
         <div class="flex flex-col items-center">
-            <i class="fa-solid fa-cloud fa-bounce text-5xl text-themeMain mb-4"></i>
-            <p class="text-themeMain font-bold tracking-wider text-sm bg-white px-4 py-1 rounded-full shadow-sm">LOADING...</p>
+            <i class="fa-solid fa-heart fa-beat text-5xl text-themePink mb-4"></i>
+            <p class="text-slate-500 font-bold tracking-widest text-sm">LOADING MAP...</p>
         </div>
     </div>
 
-    <nav class="bg-white/80 backdrop-blur-md shadow-sm border-b border-white z-50 flex-none">
-        <div class="max-w-7xl mx-auto px-3 md:px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-10 md:h-16 items-center">
-                <div class="flex items-center gap-1.5 md:gap-2 group">
-                    <div class="bg-sky-100 p-1 md:p-2 rounded-full">
-                        <i class="fa-solid fa-heart text-themeMain text-sm md:text-xl"></i>
-                    </div>
-                    <h1 class="text-base md:text-xl font-bold tracking-wide text-slate-700 font-cute flex items-baseline gap-2">
-                        Our Love Map
-                        <span class="hidden md:inline text-xs sm:text-sm font-normal text-slate-500">📍 Mapping Every Date & Memory Together</span>
-                    </h1>
-                </div>
-                <div>
-                    <button onclick="fetchData()" class="text-[11px] md:text-sm bg-slate-100 px-3 py-1 md:px-4 md:py-2 rounded-full hover:bg-sky-100 hover:text-sky-600 text-slate-500 transition shadow-sm font-bold">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> 同步
-                    </button>
-                    <a href="https://docs.google.com/spreadsheets/d/1DF-y3MZbru0_hcmwe0K0TwRW_H-s-LxhkNgKZkZiHkU/edit" target="_blank" class="ml-1 md:ml-2 text-[11px] md:text-sm bg-emerald-50 text-emerald-600 border border-emerald-100 px-3 py-1 md:px-4 md:py-2 rounded-full hover:bg-emerald-100 transition shadow-sm font-bold">
-                        <i class="fa-solid fa-table mr-1"></i> 試算表
-                    </a>
-                </div>
-            </div>
+    <!-- 導航列 -->
+    <nav class="absolute top-4 left-4 right-4 h-14 bg-white/90 backdrop-blur-md rounded-full shadow-lg z-30 flex items-center justify-between px-5 md:hidden">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-heart text-themePink text-xl"></i>
+            <h1 class="text-lg font-bold text-slate-700 font-cute">Our Love Map</h1>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-themeMain hover:text-white transition"><i class="fa-solid fa-rotate-right"></i></button>
+            <a href="https://docs.google.com/spreadsheets/d/1DF-y3MZbru0_hcmwe0K0TwRW_H-s-LxhkNgKZkZiHkU/edit" target="_blank" class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-500 hover:text-white transition"><i class="fa-solid fa-table"></i></a>
         </div>
     </nav>
 
-    <main class="flex-1 flex flex-col md:flex-row h-full overflow-hidden p-3 md:p-6 gap-6 max-w-7xl mx-auto w-full">
-        <aside class="w-full md:w-1/3 lg:w-1/4 flex flex-col h-[40%] md:h-full">
-            <div class="pb-3 px-2 border-b-2 border-slate-200">
-                <div class="flex justify-between items-end mb-2">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-images text-themeMain"></i>
-                        <h2 class="font-bold text-slate-700 text-base">回憶相簿</h2>
-                    </div>
-                    <span class="text-xs bg-sky-100 text-sky-600 px-3 py-1 rounded-full font-bold" id="count-display">0</span>
-                </div>
-                <div class="relative">
-                    <select onchange="changeSort(this.value)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 text-slate-600 focus:outline-none focus:border-themeMain cursor-pointer appearance-none font-medium">
-                        <option value="date">📅 依約會日期 (新 → 舊)</option>
-                        <option value="created">✨ 依新增順序 (新 → 舊)</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </div>
-                </div>
+    <nav class="hidden md:flex bg-white border-b border-slate-200 h-16 items-center justify-between px-6 z-30 shadow-sm relative">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-heart text-themePink text-2xl"></i>
+            <h1 class="text-xl font-bold text-slate-700 font-cute">Our Love Map <span class="text-sm font-normal text-slate-400 ml-2">📍 Mapping Every Date & Memory Together</span></h1>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="fetchData()" class="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-themeMain hover:text-white transition text-sm font-bold">同步資料</button>
+            <a href="https://docs.google.com/spreadsheets/d/1DF-y3MZbru0_hcmwe0K0TwRW_H-s-LxhkNgKZkZiHkU/edit" target="_blank" class="px-4 py-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-500 hover:text-white transition text-sm font-bold">Google Sheet</a>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex flex-col md:flex-row h-full relative overflow-hidden">
+        
+        <aside class="mobile-sheet">
+            <div class="w-full flex justify-center pt-3 pb-1 md:hidden" onclick="toggleSheet()">
+                <div class="w-10 h-1.5 bg-slate-300 rounded-full"></div>
             </div>
-            <div id="location-list" class="flex-1 overflow-y-auto no-scrollbar pb-10 mt-2 grid grid-cols-2 gap-2 p-2 md:block md:p-0"></div>
-            <button onclick="zoomToAll()" class="mt-3 w-full py-2.5 text-xs font-bold text-slate-500 hover:text-themeMain bg-white border border-slate-200 hover:border-themeMain transition shadow-sm">
-                <i class="fa-solid fa-compress mr-1"></i> 檢視全圖
-            </button>
+
+            <div class="px-5 py-2 border-b border-slate-100/50 flex justify-between items-end">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-images text-themeMain text-lg"></i>
+                    <h2 class="font-bold text-slate-700 text-lg">回憶相簿</h2>
+                </div>
+                <span class="text-xs bg-themePink text-white px-3 py-1 rounded-full font-bold" id="count-display">0</span>
+            </div>
+
+            <!-- location-list: p-5 (20px), gap-4 (16px) -->
+            <div id="location-list" class="flex-1 overflow-y-auto no-scrollbar px-5 py-2 pb-24 md:block md:p-0 md:px-6 md:py-4 md:space-y-0 grid grid-cols-1 gap-4 md:gap-4"></div>
         </aside>
 
-        <section class="w-full md:w-2/3 lg:w-3/4 p-1 relative order-1 md:order-2 h-[60%] md:h-full">
+        <section id="map-container" class="w-full h-full relative">
             <div id="map"></div>
-            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur px-6 py-2 rounded-full shadow-md text-xs font-bold text-slate-600 z-[400] pointer-events-none border border-sky-100 flex items-center gap-2">
-                <span class="w-2 h-2 bg-themeMain rounded-full"></span>
-                使用左上角搜尋或點擊地圖新增
+            
+            <!-- 底部控制器 -->
+            <div id="mobile-controls" class="absolute z-[40]">
+                
+                <ul id="search-results" class="search-scroll"></ul>
+
+                <button id="search-toggle-btn" onclick="toggleCustomSearch(event)" class="hover:bg-slate-100 transition active:scale-95">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+
+                <div id="custom-search-wrapper" class="flex-1 max-w-0 opacity-0 overflow-hidden transition-all duration-300">
+                    <input type="text" id="custom-search-input" placeholder="搜尋地點..." 
+                           class="w-full h-full bg-transparent text-slate-700 placeholder-slate-400 border-none outline-none px-2 text-base">
+                </div>
+
+                <div id="controls-group" class="controls-group flex items-center">
+                    <div class="divider"></div>
+                    <button onclick="map.zoomOut()" class="hover:bg-slate-100 transition active:scale-95"><i class="fa-solid fa-minus"></i></button>
+                    <button onclick="map.zoomIn()" class="hover:bg-slate-100 transition active:scale-95"><i class="fa-solid fa-plus"></i></button>
+                    <div class="divider"></div>
+                    <button onclick="fitAllMarkers()" class="hover:bg-themeMain hover:text-white transition active:scale-95"><i class="fa-solid fa-expand"></i></button>
+                </div>
             </div>
         </section>
-    </main>
 
-    <div id="data-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-[3px] z-[1000] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all scale-100 relative">
+    </div>
+
+    <!-- Modal -->
+    <div id="data-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[2000] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 relative animate-[fadeIn_0.2s_ease-out]">
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:bg-slate-200 transition"><i class="fa-solid fa-xmark"></i></button>
-            <div class="p-8">
-                <h3 class="font-bold text-2xl text-slate-700 mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-pen-nib text-themeMain"></i>
+            <div class="p-6">
+                <h3 class="font-bold text-xl text-slate-800 mb-5 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-themePink/10 flex items-center justify-center text-themePink"><i class="fa-solid fa-pen-nib"></i></div>
                     <span id="modal-title">Write Memory</span>
                 </h3>
-                <form id="data-form" class="space-y-5">
+                <form id="data-form" class="space-y-4">
                     <input type="hidden" id="entry-id"><input type="hidden" id="entry-lat"><input type="hidden" id="entry-lng">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
-                        <input type="text" id="entry-name" required placeholder="地點名稱..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-themeMain focus:bg-white outline-none transition font-medium">
+                        <label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Location</label>
+                        <input type="text" id="entry-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-bold focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Date</label>
-                        <input type="date" id="entry-date" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-600 focus:border-themeMain focus:bg-white outline-none transition font-medium">
+                        <label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label>
+                        <input type="date" id="entry-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition">
                     </div>
-                    <div class="bg-slate-50 p-1 rounded-full flex gap-1">
-                        <button type="button" onclick="switchTab('boy')" id="tab-boy" class="tab-btn boy flex-1 py-2 text-sm text-slate-400"><i class="fa-solid fa-mars mr-1"></i> 男友</button>
-                        <button type="button" onclick="switchTab('girl')" id="tab-girl" class="tab-btn girl flex-1 py-2 text-sm text-slate-400"><i class="fa-solid fa-venus mr-1"></i> 女友</button>
+                    <div class="bg-slate-50 p-1 rounded-xl flex gap-1">
+                        <button type="button" onclick="switchTab('boy')" id="tab-boy" class="tab-btn boy flex-1 py-2 text-sm text-slate-400 font-bold"><i class="fa-solid fa-mars mr-1"></i> 男友</button>
+                        <button type="button" onclick="switchTab('girl')" id="tab-girl" class="tab-btn girl flex-1 py-2 text-sm text-slate-400 font-bold"><i class="fa-solid fa-venus mr-1"></i> 女友</button>
                     </div>
                     <div id="panel-boy" class="hidden">
-                        <textarea id="entry-note-boy" rows="4" placeholder="男友說..." class="w-full bg-blue-50/50 rounded-lg border border-blue-100 p-4 text-sm text-slate-700 outline-none focus:border-blue-300 resize-none"></textarea>
+                        <textarea id="entry-note-boy" rows="4" placeholder="寫下你的心情..." class="w-full bg-blue-50/50 rounded-xl border border-blue-100 p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-200 resize-none"></textarea>
                     </div>
                     <div id="panel-girl" class="hidden">
-                        <textarea id="entry-note-girl" rows="4" placeholder="女友說..." class="w-full bg-pink-50/50 rounded-lg border border-pink-100 p-4 text-sm text-slate-700 outline-none focus:border-pink-300 resize-none"></textarea>
+                        <textarea id="entry-note-girl" rows="4" placeholder="寫下妳的心情..." class="w-full bg-pink-50/50 rounded-xl border border-pink-100 p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 resize-none"></textarea>
                     </div>
-                    <div class="pt-2 flex justify-end gap-3">
-                        <button type="button" onclick="closeModal()" class="px-6 py-2.5 text-sm font-bold text-slate-400 hover:text-slate-600 transition">取消</button>
-                        <button type="submit" class="px-8 py-2.5 bg-themeMain text-white text-sm rounded-full hover:bg-sky-500 shadow-lg shadow-sky-200 transform active:scale-95 transition font-bold tracking-wide">儲存</button>
+                    <div class="pt-2 flex gap-3">
+                        <button type="button" onclick="closeModal()" class="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 rounded-xl transition">取消</button>
+                        <button type="submit" class="flex-1 py-3 bg-themeMain text-white text-sm rounded-xl hover:bg-sky-500 shadow-lg shadow-sky-200 transform active:scale-95 transition font-bold tracking-wide">儲存回憶</button>
                     </div>
                 </form>
             </div>
@@ -196,16 +318,118 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzIBS75lONz_PPVYoO_M72HIo0M6le_9cuiUrKYxB8w9G13D8swdXqfv4tlZ69k28OX0A/exec"; 
-        
         let map;
         let markers = [];
         let spots = [];
         let currentTab = 'boy';
-        let currentSort = 'date'; 
+        let currentSort = 'date';
+        let isSheetExpanded = false;
+        let searchTimeout; 
+        let tempSearchMarker;
+
+        // 修改：使用 height 變化，controls 位置依賴 225px 高度
+        function toggleSheet() {
+            const sheet = document.querySelector('.mobile-sheet');
+            const controls = document.getElementById('mobile-controls');
+            
+            // 手機版邏輯 (電腦版不執行)
+            if (window.innerWidth >= 768) return;
+
+            if (sheet.style.height === '85%') { 
+                // 收回 -> 高度 225px
+                sheet.style.height = '225px';
+                controls.classList.remove('hidden-fade');
+                controls.style.pointerEvents = 'auto'; 
+                // 恢復位置：225 + 20 + 20 = 265px
+                controls.style.bottom = '265px';
+            } else { 
+                // 展開 -> 高度 85%
+                sheet.style.height = '85%';
+                controls.classList.add('hidden-fade');
+                controls.style.pointerEvents = 'none'; 
+                // 控制器跟隨上移 (雖然會隱藏)
+                controls.style.bottom = 'calc(85% + 40px)';
+            }
+            isSheetExpanded = !isSheetExpanded;
+        }
+
+        function toggleCustomSearch(e) {
+            if (e) e.stopPropagation();
+            const wrapper = document.getElementById('custom-search-wrapper');
+            const input = document.getElementById('custom-search-input');
+            const searchButton = document.getElementById('search-toggle-btn');
+            const controlsGroup = document.getElementById('controls-group');
+            const resultList = document.getElementById('search-results');
+
+            if (wrapper.classList.contains('expanded')) {
+                wrapper.classList.remove('expanded');
+                controlsGroup.classList.remove('hidden-force'); 
+                searchButton.innerHTML = '<i class="fa-solid fa-magnifying-glass text-lg"></i>';
+                input.value = '';
+                input.blur();
+                resultList.style.display = 'none';
+                if(tempSearchMarker) {
+                    map.removeLayer(tempSearchMarker);
+                    tempSearchMarker = null;
+                }
+            } else {
+                wrapper.classList.add('expanded');
+                controlsGroup.classList.add('hidden-force'); 
+                searchButton.innerHTML = '<i class="fa-solid fa-xmark text-lg"></i>';
+                input.focus();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('custom-search-input');
+            const resultList = document.getElementById('search-results');
+
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value;
+                if(query.length < 2) {
+                    resultList.style.display = 'none';
+                    return;
+                }
+
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&accept-language=zh-TW`;
+                    
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(results => {
+                            resultList.innerHTML = '';
+                            if (results && results.length > 0) {
+                                results.forEach(result => {
+                                    const li = document.createElement('li');
+                                    li.textContent = result.display_name;
+                                    li.onclick = () => {
+                                        const lat = parseFloat(result.lat);
+                                        const lon = parseFloat(result.lon);
+                                        
+                                        flyToSpot(lat, lon);
+                                        
+                                        if(tempSearchMarker) map.removeLayer(tempSearchMarker);
+                                        tempSearchMarker = L.marker([lat, lon]).addTo(map)
+                                            .bindPopup(`<b>${result.display_name.split(',')[0]}</b><br>點擊地圖其他處可新增回憶`)
+                                            .openPopup();
+                                        
+                                        toggleCustomSearch();
+                                    };
+                                    resultList.appendChild(li);
+                                });
+                                resultList.style.display = 'block';
+                            } else {
+                                resultList.style.display = 'none';
+                            }
+                        })
+                        .catch(err => console.error("Search error:", err));
+                }, 500); 
+            });
+        });
 
         function switchTab(gender) {
             currentTab = gender;
@@ -222,36 +446,34 @@
             }
         }
 
-        function changeSort(mode) {
-            currentSort = mode;
-            renderAll();
-        }
+        function changeSort(mode) { currentSort = mode; renderAll(); }
 
         function flyToSpot(lat, lng, callback) {
             const targetZoom = 16;
             const mapHeight = map.getSize().y;
-            
-            // 強制關閉 (避免錯位)
             map.closePopup();
 
+            const isMobile = window.innerWidth < 768;
+            const offsetRatio = isMobile ? 0.1 : 0; 
+
             const point = map.project([lat, lng], targetZoom);
-            const targetPoint = L.point(point.x, point.y - (mapHeight * 0.25)); 
+            const targetPoint = L.point(point.x, point.y - (mapHeight * offsetRatio)); 
             const newCenter = map.unproject(targetPoint, targetZoom);
             
-            const currentCenter = map.getCenter();
-            const dist = map.distance(currentCenter, newCenter);
-            
-            // 距離很近，直接開
-            if (dist < 50) {
-                if (callback) callback();
-                return;
-            }
+            const dist = map.distance(map.getCenter(), newCenter);
+            if (dist < 50) { if (callback) callback(); return; }
 
             map.flyTo(newCenter, targetZoom, { animate: true, duration: 0.6 });
-            
-            map.once('moveend', function() {
-                setTimeout(() => { if (callback) callback(); }, 150);
-            });
+            map.once('moveend', function() { setTimeout(() => { if (callback) callback(); }, 150); });
+        }
+
+        function fitAllMarkers() {
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            } else {
+                map.setView([25.07, 121.51], 12);
+            }
         }
 
         async function fetchData() {
@@ -261,12 +483,8 @@
                 if (!response.ok) throw new Error('Network error');
                 spots = await response.json();
                 renderAll();
-            } catch (error) {
-                console.error(error);
-                alert("讀取失敗，請確認 Script 權限與網址。\n" + error.message);
-            } finally {
-                showLoading(false);
-            }
+            } catch (error) { alert("讀取失敗：" + error.message); } 
+            finally { showLoading(false); }
         }
 
         async function sendData(action, data) {
@@ -283,27 +501,32 @@
         }
 
         function initMap() {
-            map = L.map('map').setView([25.07, 121.51], 12);
+            map = L.map('map', { zoomControl: false }).setView([25.07, 121.51], 12);
+            map.invalidateSize(); 
+            
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 20
+                attribution: '&copy; CARTO', maxZoom: 20
             }).addTo(map);
-
-            L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋地點...', errorMessage: '找不到地點' })
-            .on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
 
             map.on('click', onMapClick);
             
-            // Popup 打開時強制校正位置
             map.on('popupopen', function(e) {
                 const popup = e.popup;
                 setTimeout(() => { popup.update(); }, 10);
             });
 
             fetchData();
+
+            const controls = document.getElementById('mobile-controls');
+            if (window.innerWidth < 768) {
+                controls.style.bottom = '265px'; // 修正：初始位置改為 265px
+            } else {
+                controls.style.bottom = '24px';
+            }
         }
 
         function getHeartIcon() {
-            return L.divIcon({ className: 'heart-icon-div', html: '<i class="fa-solid fa-heart heart-marker"></i>', iconSize: [34, 34], iconAnchor: [17, 32], popupAnchor: [0, -36] });
+            return L.divIcon({ className: 'heart-icon-div', html: '<i class="fa-solid fa-heart heart-marker"></i>', iconSize: [38, 38], iconAnchor: [19, 36], popupAnchor: [0, -40] });
         }
 
         function renderAll() {
@@ -313,80 +536,77 @@
             listContainer.innerHTML = '';
             document.getElementById('count-display').innerText = spots.length;
 
-            if (spots.length === 0) listContainer.innerHTML = `<div class="p-10 text-center text-slate-300 col-span-2">尚無回憶</div>`;
+            if (spots.length === 0) listContainer.innerHTML = `<div class="p-10 text-center text-slate-300 col-span-1">尚無回憶，點擊地圖新增！</div>`;
 
             let sortedSpots = [...spots];
-            if (currentSort === 'date') { sortedSpots.sort((a, b) => new Date(b.date) - new Date(a.date)); } 
-            else if (currentSort === 'created') { sortedSpots.sort((a, b) => Number(b.id) - Number(a.id)); }
+            sortedSpots.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedSpots.forEach(spot => {
-                // UI: 移除了 onclick 互動，文字直接顯示完整
                 const popupContent = `
                     <div class="font-sans w-[280px] p-3 bg-white relative">
                         <div class="mb-2 border-b border-slate-100 pb-2 pr-24">
-                            <h3 class="font-bold text-slate-800 text-base leading-tight break-words">${spot.name}</h3>
+                            <h3 class="font-bold text-slate-800 text-lg leading-tight break-words">${spot.name}</h3>
                             <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
                                 <i class="fa-regular fa-calendar"></i><span>${spot.date}</span>
                             </div>
                         </div>
                         
                         <div class="absolute top-2.5 right-10 flex gap-1">
-                            <a href="https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}" target="_blank" class="w-6 h-6 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 transition" title="Google Map 導航"><i class="fa-solid fa-location-arrow text-[10px]"></i></a>
-                            <button onclick="editSpot(${spot.id})" class="w-6 h-6 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-sky-50 hover:text-sky-500 transition" title="編輯"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                            <a href="https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}" target="_blank" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 transition" title="導航"><i class="fa-solid fa-location-arrow text-sm"></i></a>
+                            <button onclick="editSpot(${spot.id})" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-themeMain hover:text-white transition" title="編輯"><i class="fa-solid fa-pen text-sm"></i></button>
                         </div>
 
-                        <div class="space-y-1.5 mb-2 max-h-[200px] overflow-y-auto custom-scroll pr-1">
-                            <div class="flex gap-1.5 items-start">
-                                <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div>
-                                <div class="bg-blue-50 rounded-lg rounded-tl-none px-2 py-2 text-[13px] text-slate-600 flex-1 border border-blue-100 shadow-sm">
-                                    <p class="break-words !m-0 whitespace-pre-line transition-all duration-300">${spot.note_boy || '...'}</p>
+                        <div class="space-y-2 mb-1 max-h-[220px] overflow-y-auto custom-scroll pr-1">
+                            <div class="flex gap-2 items-start">
+                                <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div>
+                                <div class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm">
+                                    <p class="break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p>
                                 </div>
                             </div>
-                            <div class="flex gap-1.5 items-start flex-row-reverse">
-                                <div class="w-5 h-5 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div>
-                                <div class="bg-pink-50 rounded-lg rounded-tr-none px-2 py-2 text-[13px] text-slate-600 flex-1 border border-pink-100 shadow-sm text-right">
-                                    <p class="break-words !m-0 text-left whitespace-pre-line transition-all duration-300">${spot.note_girl || '...'}</p>
+                            <div class="flex gap-2 items-start flex-row-reverse">
+                                <div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div>
+                                <div class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right">
+                                    <p class="break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
 
-                // 保持穩定版：同步飛行
                 const marker = L.marker([spot.lat, spot.lng], { icon: getHeartIcon() })
                     .addTo(map)
                     .bindPopup(popupContent, { maxWidth: 320, minWidth: 280, autoPan: false });
                 
                 marker.off('click');
-                marker.on('click', function() {
-                    flyToSpot(spot.lat, spot.lng, () => {
-                        this.openPopup();
-                    });
-                });
-                    
+                marker.on('click', function() { flyToSpot(spot.lat, spot.lng, () => { this.openPopup(); }); });
                 markers.push(marker);
 
+                // 修改：min-h-165px
                 const card = document.createElement('div');
-                card.className = "cute-card p-3 cursor-pointer group flex flex-col justify-between h-full min-h-[110px] md:h-auto md:min-h-0";
+                card.className = "cute-card p-4 cursor-pointer group hover:border-themeMain transition-all bg-white border border-slate-100 rounded-xl shadow-sm flex flex-col justify-between min-h-[165px] md:h-auto md:min-h-0";
+                
                 card.onclick = (e) => {
                     if(e.target.closest('button')) return;
+                    if (window.innerWidth < 768 && isSheetExpanded) {
+                        toggleSheet();
+                    }
                     flyToSpot(spot.lat, spot.lng, () => { marker.openPopup(); });
                 };
 
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
+                    <div class="flex justify-between items-start mb-3">
                         <div class="flex-1 w-full overflow-hidden">
-                            <h3 class="font-bold text-slate-700 text-base group-hover:text-themeMain transition truncate">${spot.name}</h3>
-                            <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-1"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div>
+                            <h3 class="font-bold text-slate-700 text-lg group-hover:text-themeMain transition truncate">${spot.name}</h3>
+                            <div class="flex items-center gap-1 text-xs text-slate-400 mt-1"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div>
                         </div>
-                        <div class="hidden md:flex gap-1 opacity-0 group-hover:opacity-100 transition translate-x-1 group-hover:translate-x-0">
-                            <button onclick="editSpot(${spot.id})" class="text-slate-400 hover:text-sky-500"><i class="fa-solid fa-pen text-xs"></i></button>
-                            <button onclick="deleteSpot(${spot.id})" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        <div class="flex gap-2 opacity-80">
+                            <button onclick="editSpot(${spot.id})" class="text-slate-400 hover:text-themeMain"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteSpot(${spot.id})" class="text-slate-400 hover:text-themePink"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>
-                    <div class="space-y-1 mt-auto">
-                        <div class="flex items-center gap-2 text-[11px] text-slate-400"><i class="fa-solid fa-mars text-blue-300"></i><p class="truncate flex-1">${spot.note_boy || '-'}</p></div>
-                        <div class="flex items-center gap-2 text-[11px] text-slate-400"><i class="fa-solid fa-venus text-pink-300"></i><p class="truncate flex-1">${spot.note_girl || '-'}</p></div>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 p-2 rounded-lg"><i class="fa-solid fa-mars text-blue-400"></i><p class="truncate flex-1">${spot.note_boy || '-'}</p></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 p-2 rounded-lg"><i class="fa-solid fa-venus text-themePink"></i><p class="truncate flex-1">${spot.note_girl || '-'}</p></div>
                     </div>
                 `;
                 listContainer.appendChild(card);
@@ -394,9 +614,11 @@
         }
 
         function onMapClick(e) { openModal('add', { lat: e.latlng.lat, lng: e.latlng.lng }); }
+        
         function openModal(mode, data = {}) {
             const modal = document.getElementById('data-modal');
             modal.classList.remove('hidden'); switchTab('boy');
+            
             if (mode === 'add') {
                 document.getElementById('modal-title').innerText = "New Memory";
                 document.getElementById('data-form').reset();
@@ -419,10 +641,16 @@
         function closeModal() { document.getElementById('data-modal').classList.add('hidden'); }
         window.editSpot = function(id) { const spot = spots.find(s => s.id == id); if (spot) openModal('edit', spot); };
         window.deleteSpot = function(id) { if(confirm('確定要刪除這筆回憶嗎？')) sendData('delete', { id: id }); };
-        window.zoomToAll = function() {
-            if (markers.length > 0) { const group = new L.featureGroup(markers); map.fitBounds(group.getBounds().pad(0.1)); }
-            else { map.setView([25.07, 121.51], 12); }
+        
+        window.fitAllMarkers = function() {
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            } else {
+                map.setView([25.07, 121.51], 12);
+            }
         }
+
         function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
         document.getElementById('data-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -436,6 +664,17 @@
             sendData(id ? 'update' : 'create', data);
         });
         window.onload = initMap;
+        window.addEventListener('resize', () => {
+            if (map) {
+                map.invalidateSize();
+                const controls = document.getElementById('mobile-controls');
+                if (window.innerWidth < 768) {
+                    controls.style.bottom = '265px';
+                } else {
+                    controls.style.bottom = '24px';
+                }
+            }
+        });
     </script>
 </body>
 </html>
