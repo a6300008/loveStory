@@ -75,43 +75,46 @@
 
         /* --- 響應式佈局邏輯 --- */
         
-        /* 手機版：懸浮列表 (Floating Sheet) */
+        /* 手機版：懸浮列表 */
         .mobile-sheet {
             position: absolute;
-            /* 修改：移除 top: 75%，改為固定 height: 225px */
-            height: 225px; 
+            /* 修改 1: 高度提升至 280px */
+            height: 280px; 
             left: 20px; right: 20px; bottom: 20px;
             background: rgba(255, 255, 255, 0.45);
             backdrop-filter: none;
-            border: none;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             z-index: 20;
             display: flex; flex-direction: column;
-            transition: height 0.3s ease; /* 改為 transition height */
+            transition: height 0.3s ease;
         }
 
-        /* 控制器 (Bottom Pill) */
+        /* 控制器 (Bottom Pill) - 精緻化 */
         #mobile-controls {
             position: absolute; 
-            /* 修改：預設位置為 20px(bottom) + 225px(sheet) + 20px(gap) = 265px */
-            bottom: 265px;
+            /* 修改：位置 = bottom 20px + sheet 280px + gap 20px = 320px */
+            bottom: 320px;
             left: 50%; transform: translateX(-50%);
             z-index: 40; 
             display: flex; align-items: center; 
-            gap: 12px; 
-            padding: 8px 16px;
+            /* 修改 2: 縮小間距與內距 */
+            gap: 8px; 
+            padding: 6px 12px;
+            
             background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(10px);
             border-radius: 999px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             border: 1px solid rgba(200,200,200,0.4); 
             transition: all 0.3s ease-out;
-            min-width: 220px;
-            justify-content: space-between;
+            
+            /* 修改 2: 移除 min-width，改為 auto */
+            width: auto;
+            justify-content: center;
         }
-        /* 控制器隱藏狀態 */
+        /* 控制器隱藏狀態 (展開 Sheet 時) */
         #mobile-controls.hidden-fade {
             opacity: 0;
             pointer-events: none;
@@ -119,17 +122,18 @@
         }
 
         #mobile-controls button {
-            width: 40px; height: 40px; border-radius: 999px;
+            /* 修改 2: 按鈕縮小至 36px (w-9 h-9) */
+            width: 36px; height: 36px; border-radius: 999px;
             display: flex; align-items: center; justify-content: center;
             color: #475569; 
-            font-size: 18px; 
+            font-size: 16px; /* icon 稍微縮小 */
             transition: all 0.2s; flex-shrink: 0;
         }
         #mobile-controls button:hover { 
             background-color: #f1f5f9; 
             color: #38bdf8;
         }
-        #mobile-controls .divider { width: 1px; height: 28px; background: #e2e8f0; margin: 0; }
+        #mobile-controls .divider { width: 1px; height: 20px; background: #e2e8f0; margin: 0; }
         
         /* 搜尋框樣式 */
         #custom-search-wrapper {
@@ -138,20 +142,21 @@
             display: flex; align-items: center;
         }
         #custom-search-wrapper.expanded {
-            max-width: 240px;
+            /* 修改：展開時寬度 */
+            max-width: 200px;
             opacity: 1;
         }
         #custom-search-input {
             width: 100%; height: 36px; background: transparent; 
             color: #334155; 
-            border: none; outline: none; padding: 0 8px 0 4px; font-size: 15px;
+            border: none; outline: none; padding: 0 8px 0 4px; font-size: 14px;
         }
         #custom-search-input::placeholder { color: #94a3b8; }
 
         /* 搜尋結果列表 */
         #search-results {
             position: absolute; 
-            bottom: 100%; left: 0; width: 100%; 
+            bottom: 100%; left: 50%; transform: translateX(-50%); width: 280px; 
             margin-bottom: 12px;
             background: rgba(255, 255, 255, 0.98); 
             backdrop-filter: blur(10px);
@@ -168,7 +173,7 @@
         #search-results li:last-child { border-bottom: none; }
         #search-results li:hover { background: #f0f9ff; color: #38bdf8; }
 
-        .controls-group { display: flex; align-items: center; gap: 12px; overflow: hidden; max-width: 200px; transition: max-width 0.3s ease; }
+        .controls-group { display: flex; align-items: center; gap: 8px; overflow: hidden; max-width: 200px; transition: max-width 0.3s ease; }
         .controls-group.hidden-force { max-width: 0; opacity: 0; pointer-events: none; }
 
         /* 卡片樣式 */
@@ -187,7 +192,7 @@
         @media (min-width: 768px) {
             .mobile-sheet {
                 position: static; top: auto; bottom: auto; left: auto; right: auto;
-                width: 25%; height: 100%; /* 電腦版恢復高度 */
+                width: 25%; height: 100%; 
                 background: white; 
                 border-radius: 0; box-shadow: none; border-right: 1px solid #e2e8f0; z-index: 20;
                 margin: 0; overflow: hidden;
@@ -246,7 +251,6 @@
                 <span class="text-xs bg-themePink text-white px-3 py-1 rounded-full font-bold" id="count-display">0</span>
             </div>
 
-            <!-- location-list: p-5 (20px), gap-4 (16px) -->
             <div id="location-list" class="flex-1 overflow-y-auto no-scrollbar px-5 py-2 pb-24 md:block md:p-0 md:px-6 md:py-4 md:space-y-0 grid grid-cols-1 gap-4 md:gap-4"></div>
         </aside>
 
@@ -330,7 +334,7 @@
         let searchTimeout; 
         let tempSearchMarker;
 
-        // 修改：使用 height 變化，controls 位置依賴 225px 高度
+        // 修改：使用 height 變化，controls 位置依賴 280px 高度
         function toggleSheet() {
             const sheet = document.querySelector('.mobile-sheet');
             const controls = document.getElementById('mobile-controls');
@@ -339,19 +343,18 @@
             if (window.innerWidth >= 768) return;
 
             if (sheet.style.height === '85%') { 
-                // 收回 -> 高度 225px
-                sheet.style.height = '225px';
+                // 收回 -> 高度 280px
+                sheet.style.height = '280px';
                 controls.classList.remove('hidden-fade');
                 controls.style.pointerEvents = 'auto'; 
-                // 恢復位置：225 + 20 + 20 = 265px
-                controls.style.bottom = '265px';
+                // 恢復位置：280 + 20(bottom) + 20(gap) = 320px
+                controls.style.bottom = '320px';
             } else { 
                 // 展開 -> 高度 85%
                 sheet.style.height = '85%';
+                // 隱藏 Controls (避免遮擋 Header)
                 controls.classList.add('hidden-fade');
                 controls.style.pointerEvents = 'none'; 
-                // 控制器跟隨上移 (雖然會隱藏)
-                controls.style.bottom = 'calc(85% + 40px)';
             }
             isSheetExpanded = !isSheetExpanded;
         }
@@ -367,7 +370,7 @@
             if (wrapper.classList.contains('expanded')) {
                 wrapper.classList.remove('expanded');
                 controlsGroup.classList.remove('hidden-force'); 
-                searchButton.innerHTML = '<i class="fa-solid fa-magnifying-glass text-lg"></i>';
+                searchButton.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>';
                 input.value = '';
                 input.blur();
                 resultList.style.display = 'none';
@@ -383,6 +386,7 @@
             }
         }
 
+        // 使用 ArcGIS API 搜尋 (台灣範圍優化)
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('custom-search-input');
             const resultList = document.getElementById('search-results');
@@ -396,25 +400,25 @@
 
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&accept-language=zh-TW`;
+                    const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?singleLine=${encodeURIComponent(query)}&countryCode=TW&f=json&outSR=4326&maxLocations=5`;
                     
                     fetch(url)
                         .then(response => response.json())
-                        .then(results => {
+                        .then(data => {
                             resultList.innerHTML = '';
-                            if (results && results.length > 0) {
-                                results.forEach(result => {
+                            if (data.candidates && data.candidates.length > 0) {
+                                data.candidates.forEach(result => {
                                     const li = document.createElement('li');
-                                    li.textContent = result.display_name;
+                                    li.textContent = result.address;
                                     li.onclick = () => {
-                                        const lat = parseFloat(result.lat);
-                                        const lon = parseFloat(result.lon);
+                                        const lat = result.location.y;
+                                        const lon = result.location.x;
                                         
                                         flyToSpot(lat, lon);
                                         
                                         if(tempSearchMarker) map.removeLayer(tempSearchMarker);
                                         tempSearchMarker = L.marker([lat, lon]).addTo(map)
-                                            .bindPopup(`<b>${result.display_name.split(',')[0]}</b><br>點擊地圖其他處可新增回憶`)
+                                            .bindPopup(`<b>${result.address}</b><br>點擊地圖其他處可新增回憶`)
                                             .openPopup();
                                         
                                         toggleCustomSearch();
@@ -447,6 +451,13 @@
         }
 
         function changeSort(mode) { currentSort = mode; renderAll(); }
+
+        window.toggleBubble = function(e, div) {
+            if(e) { e.stopPropagation(); e.preventDefault(); }
+            const p = div.querySelector('p');
+            p.classList.toggle('line-clamp-2');
+            setTimeout(() => { map.eachLayer(l => { if(l instanceof L.Popup && l.isOpen()) l.update(); }); }, 10);
+        };
 
         function flyToSpot(lat, lng, callback) {
             const targetZoom = 16;
@@ -519,7 +530,7 @@
 
             const controls = document.getElementById('mobile-controls');
             if (window.innerWidth < 768) {
-                controls.style.bottom = '265px'; // 修正：初始位置改為 265px
+                controls.style.bottom = '320px'; // 修正：初始位置 320px
             } else {
                 controls.style.bottom = '24px';
             }
@@ -559,14 +570,14 @@
                         <div class="space-y-2 mb-1 max-h-[220px] overflow-y-auto custom-scroll pr-1">
                             <div class="flex gap-2 items-start">
                                 <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div>
-                                <div class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm">
-                                    <p class="break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p>
+                                <div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition">
+                                    <p class="break-words !m-0 whitespace-pre-line line-clamp-2 transition-all duration-300">${spot.note_boy || '...'}</p>
                                 </div>
                             </div>
                             <div class="flex gap-2 items-start flex-row-reverse">
                                 <div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div>
-                                <div class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right">
-                                    <p class="break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p>
+                                <div class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition">
+                                    <p class="break-words !m-0 text-left whitespace-pre-line line-clamp-2 transition-all duration-300">${spot.note_girl || '...'}</p>
                                 </div>
                             </div>
                         </div>
@@ -581,7 +592,6 @@
                 marker.on('click', function() { flyToSpot(spot.lat, spot.lng, () => { this.openPopup(); }); });
                 markers.push(marker);
 
-                // 修改：min-h-165px
                 const card = document.createElement('div');
                 card.className = "cute-card p-4 cursor-pointer group hover:border-themeMain transition-all bg-white border border-slate-100 rounded-xl shadow-sm flex flex-col justify-between min-h-[165px] md:h-auto md:min-h-0";
                 
@@ -669,7 +679,7 @@
                 map.invalidateSize();
                 const controls = document.getElementById('mobile-controls');
                 if (window.innerWidth < 768) {
-                    controls.style.bottom = '265px';
+                    controls.style.bottom = '320px';
                 } else {
                     controls.style.bottom = '24px';
                 }
