@@ -5,25 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Our Love Map 📍 Mapping Every Date & Memory Together</title>
-    <meta name="description" content="不想忘記和你一起度過的任何一個午後。這是一個只屬於我們兩人的地圖，紀錄那些一起散步、一起吃飯、一起發呆的小日子。我們的故事，未完待續。">
     
-    <meta property="og:title" content="Our Love Map 📍 Mapping Every Date & Memory Together" />
-    <meta property="og:image" content="https://a6300008.github.io/loveStory/fbshare.png" />
-    
-    <link rel="apple-touch-icon" sizes="180x180" href="https://a6300008.github.io/loveStory/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://a6300008.github.io/loveStory/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://a6300008.github.io/loveStory/favicon-16x16.png">
-    <link rel="manifest" href="https://a6300008.github.io/loveStory/site.webmanifest">
-    
-    <!-- Tailwind CSS -->
+    <!-- 引入外部 API 設定 -->
+    <script src="api.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
     <script>
         tailwind.config = {
@@ -45,162 +35,98 @@
     <style>
         body { background-color: #f0f9ff; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
         
+        .view-section { display: none; height: 100%; width: 100%; position: relative; }
+        .view-section.active { display: flex; flex-direction: column; }
+
         #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; width: 100%; height: 100%; background: #e5e5e5; }
         
-        .heart-marker {
-            color: #f43f5e; font-size: 38px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        .heart-marker { color: #f43f5e; font-size: 38px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); transition: transform 0.3s; }
         .heart-marker:hover { transform: scale(1.3) translateY(-5px); }
-        .heart-icon-div {
-            width: 38px !important; height: 38px !important;
-            display: flex !important; align-items: center; justify-content: center;
-            background: transparent; border: none;
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .heart-icon-div { width: 38px !important; height: 38px !important; display: flex !important; align-items: center; justify-content: center; background: transparent; border: none; }
         
+        .no-scrollbar::-webkit-scrollbar { display: none; }
         .search-scroll::-webkit-scrollbar { width: 4px; }
-        .search-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
         .search-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; align-items: center; justify-content: center; }
 
-        #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; }
-
-        .leaflet-popup-content-wrapper { padding: 0; border-radius: 16px; box-shadow: 0 20px 40px -5px rgba(0,0,0,0.2); overflow: hidden; }
+        .leaflet-popup-content-wrapper { padding: 0; border-radius: 16px; box-shadow: 0 20px 40px -5px rgba(0,0,0,0.2); }
         .leaflet-popup-content { margin: 0 !important; width: 100% !important; }
         .leaflet-popup-content p { margin: 0 !important; }
         .leaflet-container a.leaflet-popup-close-button { top: 12px; right: 12px; color: #94a3b8; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 50%; z-index: 20; }
 
-        /* --- 響應式佈局邏輯 --- */
-        
-        /* 手機版：懸浮列表 */
+        /* Mobile Sheet */
         .mobile-sheet {
-            position: absolute;
-            /* 修改 1: 高度提升至 280px */
-            height: 280px; 
-            left: 20px; right: 20px; bottom: 20px;
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: none;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            z-index: 20;
-            display: flex; flex-direction: column;
-            transition: height 0.3s ease;
+            position: absolute; height: 280px; 
+            left: 20px; right: 20px; 
+            bottom: 80px; 
+            background: rgba(255, 255, 255, 0.45); border-radius: 12px; overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 20; display: flex; flex-direction: column; transition: height 0.3s ease;
         }
 
-        /* 控制器 (Bottom Pill) - 精緻化 */
+        /* Mobile Controls */
         #mobile-controls {
             position: absolute; 
-            /* 修改：位置 = bottom 20px + sheet 280px + gap 20px = 320px */
-            bottom: 320px;
-            left: 50%; transform: translateX(-50%);
-            z-index: 40; 
-            display: flex; align-items: center; 
-            /* 修改 2: 縮小間距與內距 */
-            gap: 8px; 
-            padding: 6px 12px;
-            
-            background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(10px);
-            border-radius: 999px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            border: 1px solid rgba(200,200,200,0.4); 
-            transition: all 0.3s ease-out;
-            
-            /* 修改 2: 移除 min-width，改為 auto */
-            width: auto;
-            justify-content: center;
+            /* 修改：從 430px 下調至 380px */
+            bottom: 380px; 
+            left: 50%; transform: translateX(-50%); z-index: 40; 
+            display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 999px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid rgba(200,200,200,0.4); 
+            transition: all 0.3s ease-out; min-width: 220px; justify-content: space-between;
         }
-        /* 控制器隱藏狀態 (展開 Sheet 時) */
-        #mobile-controls.hidden-fade {
-            opacity: 0;
-            pointer-events: none;
-            transform: translateX(-50%) translateY(20px);
-        }
-
-        #mobile-controls button {
-            /* 修改 2: 按鈕縮小至 36px (w-9 h-9) */
-            width: 36px; height: 36px; border-radius: 999px;
-            display: flex; align-items: center; justify-content: center;
-            color: #475569; 
-            font-size: 16px; /* icon 稍微縮小 */
-            transition: all 0.2s; flex-shrink: 0;
-        }
-        #mobile-controls button:hover { 
-            background-color: #f1f5f9; 
-            color: #38bdf8;
-        }
-        #mobile-controls .divider { width: 1px; height: 20px; background: #e2e8f0; margin: 0; }
+        #mobile-controls.hidden-fade { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
+        #mobile-controls button { width: 40px; height: 40px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
+        #mobile-controls button:hover { background-color: #f1f5f9; color: #38bdf8; }
+        #mobile-controls .divider { width: 1px; height: 28px; background: #e2e8f0; margin: 0; }
         
-        /* 搜尋框樣式 */
-        #custom-search-wrapper {
-            max-width: 0; opacity: 0; overflow: hidden;
-            transition: max-width 0.3s ease-out, opacity 0.2s ease-out;
-            display: flex; align-items: center;
-        }
-        #custom-search-wrapper.expanded {
-            /* 修改：展開時寬度 */
-            max-width: 200px;
-            opacity: 1;
-        }
-        #custom-search-input {
-            width: 100%; height: 36px; background: transparent; 
-            color: #334155; 
-            border: none; outline: none; padding: 0 8px 0 4px; font-size: 14px;
-        }
-        #custom-search-input::placeholder { color: #94a3b8; }
-
-        /* 搜尋結果列表 */
-        #search-results {
-            position: absolute; 
-            bottom: 100%; left: 50%; transform: translateX(-50%); width: 280px; 
-            margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.98); 
-            backdrop-filter: blur(10px);
-            border-radius: 12px; border: 1px solid #e2e8f0;
-            max-height: 250px; overflow-y: auto; display: none;
-            padding: 4px 0; color: #334155;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 50;
-        }
-        #search-results li {
-            padding: 12px 16px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
-            line-height: 1.4;
-        }
-        #search-results li:last-child { border-bottom: none; }
+        /* Search */
+        #custom-search-wrapper { max-width: 0; opacity: 0; overflow: hidden; transition: max-width 0.3s ease-out, opacity 0.2s ease-out; display: flex; align-items: center; }
+        #custom-search-wrapper.expanded { max-width: 310px; opacity: 1; }
+        #custom-search-input { width: 100%; height: 36px; background: transparent; color: #334155; border: none; outline: none; padding: 0 8px 0 4px; font-size: 15px; }
+        #search-results { position: absolute; bottom: 100%; left: 0; width: 100%; margin-bottom: 12px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid #e2e8f0; max-height: 250px; overflow-y: auto; display: none; padding: 4px 0; color: #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 50; }
+        #search-results li { padding: 12px 16px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
         #search-results li:hover { background: #f0f9ff; color: #38bdf8; }
-
-        .controls-group { display: flex; align-items: center; gap: 8px; overflow: hidden; max-width: 200px; transition: max-width 0.3s ease; }
+        .controls-group { display: flex; align-items: center; gap: 12px; overflow: hidden; max-width: 200px; transition: max-width 0.3s ease; }
         .controls-group.hidden-force { max-width: 0; opacity: 0; pointer-events: none; }
 
-        /* 卡片樣式 */
-        .cute-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            transition: all 0.25s ease-out;
-            position: relative; 
-            overflow: hidden;
-            border-radius: 0.75rem; 
+        /* Card Styles */
+        .cute-card { 
+            background: white; border: 1px solid #e2e8f0; transition: all 0.25s ease-out; position: relative; overflow: hidden; border-radius: 0.75rem;
+            min-height: 165px; display: flex; flex-direction: column; justify-content: space-between;
         }
         .cute-card:hover { background-color: #f0f9ff; border-color: #bae6fd; z-index: 10; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
-        .cute-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #e2e8f0; transition: all 0.25s ease; }
-        .cute-card:hover::before { width: 6px; background: #38bdf8; }
+        .tab-btn { transition: all 0.2s; border-radius: 99px; border: 2px solid transparent; }
+        .tab-btn.boy.active { background: #dbeafe; color: #2563eb; border-color: #2563eb; }
+        .tab-btn.girl.active { background: #ffe4e6; color: #e11d48; border-color: #e11d48; }
+
+        /* Diary Styles */
+        .diary-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; position: relative; }
+        .diary-images-container { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+        .diary-img-wrapper { flex: 0 0 100%; scroll-snap-align: start; position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }
+        .diary-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
+        .diary-img:hover { transform: scale(1.02); }
+        .diary-images-container.multi .diary-img-wrapper { flex: 0 0 85%; } 
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; items-center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; transition: all 0.2s; }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .nav-item.active { color: #38bdf8; }
+
+        /* Lightbox */
+        #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; }
+        #lightbox img { max-width: 100%; max-height: 80vh; object-fit: contain; }
+        .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 30px; padding: 20px; cursor: pointer; z-index: 3001; }
+        .lightbox-prev { left: 10px; }
+        .lightbox-next { right: 10px; }
 
         @media (min-width: 768px) {
-            .mobile-sheet {
-                position: static; top: auto; bottom: auto; left: auto; right: auto;
-                width: 25%; height: 100%; 
-                background: white; 
-                border-radius: 0; box-shadow: none; border-right: 1px solid #e2e8f0; z-index: 20;
-                margin: 0; overflow: hidden;
-            }
-            .mobile-sheet > div:first-child { display: none; }
+            .mobile-sheet { position: static; width: 25%; height: 100%; background: white; border-radius: 0; box-shadow: none; border-right: 1px solid #e2e8f0; z-index: 20; margin: 0; overflow: hidden; }
             #map-container { position: relative; width: 75%; height: 100%; }
-            #map { position: relative; }
             #mobile-controls { bottom: 24px; left: 50%; transform: translateX(-50%); }
+            .bottom-nav { display: none; }
+            .diary-container { max-width: 600px; margin: 0 auto; padding-top: 20px; }
+            .cute-card { min-height: 0; display: block; }
         }
     </style>
 </head>
@@ -213,249 +139,337 @@
         </div>
     </div>
 
-    <!-- 導航列 -->
-    <nav class="absolute top-4 left-4 right-4 h-14 bg-white/90 backdrop-blur-md rounded-full shadow-lg z-30 flex items-center justify-between px-5 md:hidden">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-heart text-themePink text-xl"></i>
-            <h1 class="text-lg font-bold text-slate-700 font-cute">Our Love Map</h1>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="fetchData()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-themeMain hover:text-white transition"><i class="fa-solid fa-rotate-right"></i></button>
-            <a href="https://docs.google.com/spreadsheets/d/1DF-y3MZbru0_hcmwe0K0TwRW_H-s-LxhkNgKZkZiHkU/edit" target="_blank" class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-500 hover:text-white transition"><i class="fa-solid fa-table"></i></a>
-        </div>
-    </nav>
-
-    <nav class="hidden md:flex bg-white border-b border-slate-200 h-16 items-center justify-between px-6 z-30 shadow-sm relative">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-heart text-themePink text-2xl"></i>
-            <h1 class="text-xl font-bold text-slate-700 font-cute">Our Love Map <span class="text-sm font-normal text-slate-400 ml-2">📍 Mapping Every Date & Memory Together</span></h1>
-        </div>
-        <div class="flex gap-3">
-            <button onclick="fetchData()" class="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-themeMain hover:text-white transition text-sm font-bold">同步資料</button>
-            <a href="https://docs.google.com/spreadsheets/d/1DF-y3MZbru0_hcmwe0K0TwRW_H-s-LxhkNgKZkZiHkU/edit" target="_blank" class="px-4 py-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-500 hover:text-white transition text-sm font-bold">Google Sheet</a>
-        </div>
-    </nav>
-
-    <div class="flex-1 flex flex-col md:flex-row h-full relative overflow-hidden">
-        
-        <aside class="mobile-sheet">
-            <div class="w-full flex justify-center pt-3 pb-1 md:hidden" onclick="toggleSheet()">
-                <div class="w-10 h-1.5 bg-slate-300 rounded-full"></div>
-            </div>
-
-            <div class="px-5 py-2 border-b border-slate-100/50 flex justify-between items-end">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-images text-themeMain text-lg"></i>
-                    <h2 class="font-bold text-slate-700 text-lg">回憶相簿</h2>
-                </div>
-                <span class="text-xs bg-themePink text-white px-3 py-1 rounded-full font-bold" id="count-display">0</span>
-            </div>
-
-            <div id="location-list" class="flex-1 overflow-y-auto no-scrollbar px-5 py-2 pb-24 md:block md:p-0 md:px-6 md:py-4 md:space-y-0 grid grid-cols-1 gap-4 md:gap-4"></div>
-        </aside>
-
-        <section id="map-container" class="w-full h-full relative">
-            <div id="map"></div>
-            
-            <!-- 底部控制器 -->
-            <div id="mobile-controls" class="absolute z-[40]">
-                
-                <ul id="search-results" class="search-scroll"></ul>
-
-                <button id="search-toggle-btn" onclick="toggleCustomSearch(event)" class="hover:bg-slate-100 transition active:scale-95">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-
-                <div id="custom-search-wrapper" class="flex-1 max-w-0 opacity-0 overflow-hidden transition-all duration-300">
-                    <input type="text" id="custom-search-input" placeholder="搜尋地點..." 
-                           class="w-full h-full bg-transparent text-slate-700 placeholder-slate-400 border-none outline-none px-2 text-base">
-                </div>
-
-                <div id="controls-group" class="controls-group flex items-center">
-                    <div class="divider"></div>
-                    <button onclick="map.zoomOut()" class="hover:bg-slate-100 transition active:scale-95"><i class="fa-solid fa-minus"></i></button>
-                    <button onclick="map.zoomIn()" class="hover:bg-slate-100 transition active:scale-95"><i class="fa-solid fa-plus"></i></button>
-                    <div class="divider"></div>
-                    <button onclick="fitAllMarkers()" class="hover:bg-themeMain hover:text-white transition active:scale-95"><i class="fa-solid fa-expand"></i></button>
-                </div>
-            </div>
-        </section>
-
+    <!-- Lightbox -->
+    <div id="lightbox" class="hidden flex flex-col items-center justify-center">
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-3xl z-50 p-2"><i class="fa-solid fa-xmark"></i></button>
+        <div class="lightbox-nav lightbox-prev" onclick="changeSlide(-1)"><i class="fa-solid fa-chevron-left"></i></div>
+        <img id="lightbox-img" src="" alt="Full view">
+        <div class="lightbox-nav lightbox-next" onclick="changeSlide(1)"><i class="fa-solid fa-chevron-right"></i></div>
+        <div class="absolute bottom-6 text-white text-sm tracking-widest" id="lightbox-counter">1 / 1</div>
     </div>
 
-    <!-- Modal -->
+    <!-- View 1: Map -->
+    <div id="view-map" class="view-section active">
+        <nav class="absolute top-4 left-4 right-4 h-14 bg-white/90 backdrop-blur-md rounded-full shadow-lg z-30 flex items-center justify-between px-5 md:hidden">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-heart text-themePink text-xl"></i><h1 class="text-lg font-bold text-slate-700 font-cute">Our Love Map</h1></div>
+            <div class="flex gap-2"><button onclick="fetchData('map')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-themeMain hover:text-white transition"><i class="fa-solid fa-rotate-right"></i></button></div>
+        </nav>
+        <nav class="hidden md:flex bg-white border-b border-slate-200 h-16 items-center justify-between px-6 z-30 shadow-sm relative">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-heart text-themePink text-2xl"></i><h1 class="text-xl font-bold text-slate-700 font-cute">Our Love Map</h1></div>
+            <div class="flex gap-3"><button onclick="switchView('map')" class="px-4 py-1.5 rounded-lg bg-themeMain text-white font-bold">地圖</button><button onclick="switchView('diary')" class="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-themeMain hover:text-white transition font-bold text-slate-500">日記</button></div>
+        </nav>
+        <div class="flex-1 flex flex-col md:flex-row h-full relative overflow-hidden">
+            <aside class="mobile-sheet">
+                <div class="w-full flex justify-center pt-3 pb-1 md:hidden" onclick="toggleSheet()"><div class="w-10 h-1.5 bg-slate-300 rounded-full"></div></div>
+                <div class="px-5 py-2 border-b border-slate-100/50 flex justify-between items-end">
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-images text-themeMain text-lg"></i><h2 class="font-bold text-slate-700 text-lg">回憶相簿</h2></div>
+                    <span class="text-xs bg-themePink text-white px-3 py-1 rounded-full font-bold" id="map-count-display">0</span>
+                </div>
+                <div id="location-list" class="flex-1 overflow-y-auto no-scrollbar px-5 py-2 pb-24 md:block md:p-0 md:px-6 md:py-4 md:space-y-0 grid grid-cols-1 gap-4 md:gap-4"></div>
+            </aside>
+            <section id="map-container" class="w-full h-full relative">
+                <div id="map"></div>
+                <div id="mobile-controls" class="absolute z-[40]">
+                    <ul id="search-results" class="search-scroll"></ul>
+                    <button id="search-toggle-btn" onclick="toggleCustomSearch(event)" class="hover:bg-slate-100 transition active:scale-95"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <div id="custom-search-wrapper" class="flex-1 max-w-0 opacity-0 overflow-hidden transition-all duration-300"><input type="text" id="custom-search-input" placeholder="搜尋地點..." class="w-full h-full bg-transparent text-slate-700 placeholder-slate-400 border-none outline-none px-2 text-base"></div>
+                    <div id="controls-group" class="controls-group flex items-center"><div class="divider"></div><button onclick="map.zoomOut()" class="hover:bg-slate-100 transition active:scale-95"><i class="fa-solid fa-minus"></i></button><button onclick="map.zoomIn()" class="hover:bg-slate-100 transition active:scale-95"><i class="fa-solid fa-plus"></i></button><div class="divider"></div><button onclick="fitAllMarkers()" class="hover:bg-themeMain hover:text-white transition active:scale-95"><i class="fa-solid fa-expand"></i></button></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- View 2: Diary -->
+    <div id="view-diary" class="view-section bg-slate-50 overflow-y-auto pb-24">
+        <nav class="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-200 h-16 md:h-20 flex items-center justify-between px-5 md:px-6 z-30 shadow-sm py-2">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-book-open text-themeMain text-xl"></i><h1 class="text-lg md:text-xl font-bold text-slate-700">每日日記</h1></div>
+            <div class="hidden md:flex gap-3"><button onclick="switchView('map')" class="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-themeMain hover:text-white transition font-bold text-slate-500">地圖</button><button onclick="switchView('diary')" class="px-4 py-1.5 rounded-lg bg-themeMain text-white font-bold">日記</button></div>
+            <button onclick="openDiaryModal('add')" class="md:hidden w-10 h-10 rounded-full bg-themeMain text-white flex items-center justify-center shadow-lg"><i class="fa-solid fa-plus text-lg"></i></button>
+            <button onclick="openDiaryModal('add')" class="hidden md:block px-4 py-1.5 rounded-lg bg-themeMain text-white font-bold shadow hover:bg-sky-500 transition"><i class="fa-solid fa-pen-fancy mr-2"></i>寫日記</button>
+        </nav>
+        <div class="diary-container px-4 py-6" id="diary-list"></div>
+    </div>
+
+    <div class="bottom-nav md:hidden">
+        <div class="nav-item active" onclick="switchView('map')"><i class="fa-solid fa-map-location-dot"></i><span>地圖</span></div>
+        <div class="nav-item" onclick="switchView('diary')"><i class="fa-solid fa-book-journal-whills"></i><span>日記</span></div>
+    </div>
+
+    <!-- Map Modal -->
     <div id="data-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[2000] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 relative animate-[fadeIn_0.2s_ease-out]">
-            <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:bg-slate-200 transition"><i class="fa-solid fa-xmark"></i></button>
-            <div class="p-6">
-                <h3 class="font-bold text-xl text-slate-800 mb-5 flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-themePink/10 flex items-center justify-center text-themePink"><i class="fa-solid fa-pen-nib"></i></div>
-                    <span id="modal-title">Write Memory</span>
-                </h3>
+            <button onclick="closeModal('data-modal')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:bg-slate-200 transition"><i class="fa-solid fa-xmark"></i></button>
+            <div class="p-6 max-h-[90vh] overflow-y-auto no-scrollbar">
+                <h3 class="font-bold text-xl text-slate-800 mb-5 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-themePink/10 flex items-center justify-center text-themePink"><i class="fa-solid fa-pen-nib"></i></div><span id="modal-title">Write Memory</span></h3>
                 <form id="data-form" class="space-y-4">
                     <input type="hidden" id="entry-id"><input type="hidden" id="entry-lat"><input type="hidden" id="entry-lng">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Location</label>
-                        <input type="text" id="entry-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-bold focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition">
+                        <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photo</label>
+                        <input type="file" id="entry-image" accept="image/*" class="hidden" onchange="previewSingleImage(this, 'preview-container')">
+                        <div id="preview-container" class="w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-themeMain transition" onclick="document.getElementById('entry-image').click()"><i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片 (單張)</span></div>
+                    </div>
+                    <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Location</label><input type="text" id="entry-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-bold focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label><input type="date" id="entry-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
+                    <div class="bg-slate-50 p-1 rounded-xl flex gap-1">
+                        <button type="button" onclick="switchTab('boy', 'panel-boy', 'panel-girl', this)" class="tab-btn boy flex-1 py-2 text-sm text-slate-400 font-bold"><i class="fa-solid fa-mars mr-1"></i> 男友</button>
+                        <button type="button" onclick="switchTab('girl', 'panel-boy', 'panel-girl', this)" class="tab-btn girl flex-1 py-2 text-sm text-slate-400 font-bold"><i class="fa-solid fa-venus mr-1"></i> 女友</button>
+                    </div>
+                    <div id="panel-boy" class="hidden"><textarea id="entry-note-boy" rows="4" placeholder="寫下你的心情..." class="w-full bg-blue-50/50 rounded-xl border border-blue-100 p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-200 resize-none"></textarea></div>
+                    <div id="panel-girl" class="hidden"><textarea id="entry-note-girl" rows="4" placeholder="寫下妳的心情..." class="w-full bg-pink-50/50 rounded-xl border border-pink-100 p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 resize-none"></textarea></div>
+                    <div class="pt-2 flex gap-3"><button type="button" onclick="closeModal('data-modal')" class="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 rounded-xl transition">取消</button><button type="submit" class="flex-1 py-3 bg-themeMain text-white text-sm rounded-xl hover:bg-sky-500 shadow-lg shadow-sky-200 transform active:scale-95 transition font-bold tracking-wide">儲存</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diary Modal -->
+    <div id="diary-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[2000] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 relative animate-[fadeIn_0.2s_ease-out]">
+            <button onclick="closeModal('diary-modal')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:bg-slate-200 transition"><i class="fa-solid fa-xmark"></i></button>
+            <div class="p-6 max-h-[90vh] overflow-y-auto no-scrollbar">
+                <h3 class="font-bold text-xl text-slate-800 mb-5 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-themeMain/10 flex items-center justify-center text-themeMain"><i class="fa-solid fa-book"></i></div><span id="diary-modal-title">New Diary</span></h3>
+                <form id="diary-form" class="space-y-4">
+                    <input type="hidden" id="diary-id">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Who's Writing?</label>
+                        <div class="bg-slate-50 p-1 rounded-xl flex gap-1">
+                            <button type="button" id="diary-btn-boy" onclick="setDiaryAuthor('boy')" class="tab-btn boy flex-1 py-2 text-sm text-slate-400 font-bold active"><i class="fa-solid fa-mars mr-1"></i> 男友</button>
+                            <button type="button" id="diary-btn-girl" onclick="setDiaryAuthor('girl')" class="tab-btn girl flex-1 py-2 text-sm text-slate-400 font-bold"><i class="fa-solid fa-venus mr-1"></i> 女友</button>
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label>
-                        <input type="date" id="entry-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition">
+                        <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photos (Multiple)</label>
+                        <input type="file" id="diary-image-input" accept="image/*" multiple class="hidden" onchange="previewMultiImages(this)">
+                        <div id="diary-preview-container" class="w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[100px] cursor-pointer hover:border-themeMain transition" onclick="document.getElementById('diary-image-input').click()"><div class="w-full flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-images text-2xl mb-2"></i><span class="text-xs font-bold">點擊上傳多張照片</span></div></div>
                     </div>
-                    <div class="bg-slate-50 p-1 rounded-xl flex gap-1">
-                        <button type="button" onclick="switchTab('boy')" id="tab-boy" class="tab-btn boy flex-1 py-2 text-sm text-slate-400 font-bold"><i class="fa-solid fa-mars mr-1"></i> 男友</button>
-                        <button type="button" onclick="switchTab('girl')" id="tab-girl" class="tab-btn girl flex-1 py-2 text-sm text-slate-400 font-bold"><i class="fa-solid fa-venus mr-1"></i> 女友</button>
-                    </div>
-                    <div id="panel-boy" class="hidden">
-                        <textarea id="entry-note-boy" rows="4" placeholder="寫下你的心情..." class="w-full bg-blue-50/50 rounded-xl border border-blue-100 p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-200 resize-none"></textarea>
-                    </div>
-                    <div id="panel-girl" class="hidden">
-                        <textarea id="entry-note-girl" rows="4" placeholder="寫下妳的心情..." class="w-full bg-pink-50/50 rounded-xl border border-pink-100 p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 resize-none"></textarea>
-                    </div>
-                    <div class="pt-2 flex gap-3">
-                        <button type="button" onclick="closeModal()" class="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 rounded-xl transition">取消</button>
-                        <button type="submit" class="flex-1 py-3 bg-themeMain text-white text-sm rounded-xl hover:bg-sky-500 shadow-lg shadow-sky-200 transform active:scale-95 transition font-bold tracking-wide">儲存回憶</button>
-                    </div>
+                    <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label><input type="date" id="diary-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Content</label><textarea id="diary-content" rows="5" required placeholder="紀錄今天的小日子..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-themeMain focus:border-transparent resize-none"></textarea></div>
+                    <div class="pt-2 flex gap-3"><button type="button" onclick="closeModal('diary-modal')" class="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 bg-slate-50 rounded-xl transition">取消</button><button type="submit" class="flex-1 py-3 bg-themeMain text-white text-sm rounded-xl hover:bg-sky-500 shadow-lg shadow-sky-200 transform active:scale-95 transition font-bold tracking-wide">發佈</button></div>
                 </form>
             </div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzIBS75lONz_PPVYoO_M72HIo0M6le_9cuiUrKYxB8w9G13D8swdXqfv4tlZ69k28OX0A/exec"; 
+        // 若 api.js 未載入，請確認路徑或取消下方註解並填入網址
+        // const API_URL = "YOUR_GAS_URL";
+
         let map;
         let markers = [];
         let spots = [];
+        let diaries = [];
         let currentTab = 'boy';
         let currentSort = 'date';
         let isSheetExpanded = false;
         let searchTimeout; 
         let tempSearchMarker;
+        let currentImageBase64 = "";
+        let currentView = 'map';
+        
+        let currentDiaryAuthor = 'boy';
+        let currentDiaryImages = []; 
+        let lightboxImages = [];
+        let lightboxIndex = 0;
 
-        // 修改：使用 height 變化，controls 位置依賴 280px 高度
+        function switchView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(view === 'map') {
+                document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+                if(map) setTimeout(() => map.invalidateSize(), 100);
+                fetchData('map');
+            } else {
+                document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+                fetchData('diary');
+            }
+        }
+
+        function previewSingleImage(input, containerId) {
+            if (input.files && input.files[0]) {
+                processImage(input.files[0], (base64) => {
+                    currentImageBase64 = base64;
+                    document.getElementById(containerId).innerHTML = `<img src="${base64}" class="w-full h-auto rounded-lg object-cover">`;
+                });
+            }
+        }
+
+        function previewMultiImages(input) {
+            if (input.files) {
+                const container = document.getElementById('diary-preview-container');
+                container.innerHTML = '';
+                currentDiaryImages = []; 
+                Array.from(input.files).forEach(file => {
+                    processImage(file, (base64) => {
+                        currentDiaryImages.push(base64);
+                        const imgDiv = document.createElement('div');
+                        imgDiv.className = "w-20 h-20 rounded-lg overflow-hidden relative border border-slate-200 flex-shrink-0";
+                        imgDiv.innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
+                        container.appendChild(imgDiv);
+                    });
+                });
+            }
+        }
+
+        function processImage(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX_WIDTH = 600;
+                    let width = img.width; let height = img.height;
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openLightbox(images, index) {
+            lightboxImages = images; lightboxIndex = index; updateLightbox();
+            document.getElementById('lightbox').classList.remove('hidden');
+            document.getElementById('lightbox').classList.add('flex');
+        }
+        function closeLightbox() { 
+            document.getElementById('lightbox').classList.add('hidden'); 
+            document.getElementById('lightbox').classList.remove('flex');
+        }
+        function changeSlide(step) {
+            lightboxIndex += step;
+            if (lightboxIndex < 0) lightboxIndex = lightboxImages.length - 1;
+            if (lightboxIndex >= lightboxImages.length) lightboxIndex = 0;
+            updateLightbox();
+        }
+        function updateLightbox() {
+            document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+            document.getElementById('lightbox-counter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
+
+        async function fetchData(type) {
+            showLoading(true);
+            try {
+                // 強制讀取：type='map' (工作表1) 或 type='diary' (工作表2)
+                const response = await fetch(`${API_URL}?action=read&type=${type}&t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+                if (type === 'map') { spots = data; renderMapAll(); } 
+                else { diaries = data; renderDiaryAll(); }
+            } catch (error) { alert("讀取失敗：" + error.message); } 
+            finally { showLoading(false); }
+        }
+
+        async function sendData(action, type, data, modalId) {
+            showLoading(true);
+            try {
+                // 強制加入 type 參數讓後端判斷
+                const payload = { ...data, type: type };
+                const response = await fetch(`${API_URL}?action=${action}`, {
+                    method: 'POST', body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                const result = await response.json();
+                if (result.status === "success") { await fetchData(type); if(modalId) closeModal(modalId); } 
+                else { throw new Error(result.message); }
+            } catch (error) { alert("儲存失敗：" + error.message); }
+            finally { showLoading(false); }
+        }
+
+        // === MAP FUNCTIONS ===
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([25.07, 121.51], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 20 }).addTo(map);
+            L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋...', errorMessage: 'Not Found' }).on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
+            
+            // 移除 map.on('click', onMapClick);  <-- 已移除點擊新增功能
+
+            map.on('popupopen', function(e) { setTimeout(() => { e.popup.update(); }, 10); });
+            fetchData('map');
+            const controls = document.getElementById('mobile-controls');
+            if (window.innerWidth < 768) controls.style.bottom = '380px'; else controls.style.bottom = '24px';
+        }
+
         function toggleSheet() {
             const sheet = document.querySelector('.mobile-sheet');
             const controls = document.getElementById('mobile-controls');
-            
-            // 手機版邏輯 (電腦版不執行)
             if (window.innerWidth >= 768) return;
-
-            if (sheet.style.height === '85%') { 
-                // 收回 -> 高度 280px
-                sheet.style.height = '280px';
-                controls.classList.remove('hidden-fade');
-                controls.style.pointerEvents = 'auto'; 
-                // 恢復位置：280 + 20(bottom) + 20(gap) = 320px
-                controls.style.bottom = '320px';
+            if (sheet.style.height === '70%') { // 修改：展開高度為 70%
+                sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '420px';
             } else { 
-                // 展開 -> 高度 85%
-                sheet.style.height = '85%';
-                // 隱藏 Controls (避免遮擋 Header)
-                controls.classList.add('hidden-fade');
-                controls.style.pointerEvents = 'none'; 
+                sheet.style.height = '70%'; controls.classList.add('hidden-fade'); controls.style.pointerEvents = 'none'; 
             }
             isSheetExpanded = !isSheetExpanded;
         }
-
+        
         function toggleCustomSearch(e) {
-            if (e) e.stopPropagation();
+             if (e) e.stopPropagation();
             const wrapper = document.getElementById('custom-search-wrapper');
             const input = document.getElementById('custom-search-input');
             const searchButton = document.getElementById('search-toggle-btn');
             const controlsGroup = document.getElementById('controls-group');
             const resultList = document.getElementById('search-results');
-
             if (wrapper.classList.contains('expanded')) {
-                wrapper.classList.remove('expanded');
-                controlsGroup.classList.remove('hidden-force'); 
-                searchButton.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>';
-                input.value = '';
-                input.blur();
-                resultList.style.display = 'none';
-                if(tempSearchMarker) {
-                    map.removeLayer(tempSearchMarker);
-                    tempSearchMarker = null;
-                }
+                wrapper.classList.remove('expanded'); controlsGroup.classList.remove('hidden-force'); 
+                searchButton.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>'; input.value = ''; input.blur(); resultList.style.display = 'none';
+                if(tempSearchMarker) { map.removeLayer(tempSearchMarker); tempSearchMarker = null; }
             } else {
-                wrapper.classList.add('expanded');
-                controlsGroup.classList.add('hidden-force'); 
-                searchButton.innerHTML = '<i class="fa-solid fa-xmark text-lg"></i>';
-                input.focus();
+                wrapper.classList.add('expanded'); controlsGroup.classList.add('hidden-force'); 
+                searchButton.innerHTML = '<i class="fa-solid fa-xmark"></i>'; input.focus();
             }
         }
-
-        // 使用 ArcGIS API 搜尋 (台灣範圍優化)
+        
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('custom-search-input');
             const resultList = document.getElementById('search-results');
-
             searchInput.addEventListener('input', function(e) {
                 const query = e.target.value;
-                if(query.length < 2) {
-                    resultList.style.display = 'none';
-                    return;
-                }
-
+                if(query.length < 2) { resultList.style.display = 'none'; return; }
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?singleLine=${encodeURIComponent(query)}&countryCode=TW&f=json&outSR=4326&maxLocations=5`;
-                    
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            resultList.innerHTML = '';
-                            if (data.candidates && data.candidates.length > 0) {
-                                data.candidates.forEach(result => {
-                                    const li = document.createElement('li');
-                                    li.textContent = result.address;
-                                    li.onclick = () => {
-                                        const lat = result.location.y;
-                                        const lon = result.location.x;
-                                        
-                                        flyToSpot(lat, lon);
-                                        
-                                        if(tempSearchMarker) map.removeLayer(tempSearchMarker);
-                                        tempSearchMarker = L.marker([lat, lon]).addTo(map)
-                                            .bindPopup(`<b>${result.address}</b><br>點擊地圖其他處可新增回憶`)
-                                            .openPopup();
-                                        
-                                        toggleCustomSearch();
-                                    };
-                                    resultList.appendChild(li);
-                                });
-                                resultList.style.display = 'block';
-                            } else {
-                                resultList.style.display = 'none';
-                            }
-                        })
-                        .catch(err => console.error("Search error:", err));
+                    fetch(url).then(r => r.json()).then(data => {
+                        resultList.innerHTML = '';
+                        if (data.candidates && data.candidates.length > 0) {
+                            data.candidates.forEach(result => {
+                                const li = document.createElement('li'); li.textContent = result.address;
+                                li.onclick = () => {
+                                    flyToSpot(result.location.y, result.location.x);
+                                    if(tempSearchMarker) map.removeLayer(tempSearchMarker);
+                                    tempSearchMarker = L.marker([result.location.y, result.location.x]).addTo(map).bindPopup(`<b>${result.address}</b><br>點擊地圖其他處可新增`).openPopup();
+                                    toggleCustomSearch();
+                                };
+                                resultList.appendChild(li);
+                            });
+                            resultList.style.display = 'block';
+                        } else { resultList.style.display = 'none'; }
+                    });
                 }, 500); 
             });
         });
 
-        function switchTab(gender) {
-            currentTab = gender;
-            const boyBtn = document.getElementById('tab-boy');
-            const girlBtn = document.getElementById('tab-girl');
-            const boyPanel = document.getElementById('panel-boy');
-            const girlPanel = document.getElementById('panel-girl');
-            if (gender === 'boy') {
-                boyBtn.classList.add('active'); girlBtn.classList.remove('active');
-                boyPanel.classList.remove('hidden'); girlPanel.classList.add('hidden');
-            } else {
-                boyBtn.classList.remove('active'); girlBtn.classList.add('active');
-                boyPanel.classList.add('hidden'); girlPanel.classList.remove('hidden');
-            }
+        function switchTab(gender, boyPanelId, girlPanelId, btn) {
+            const container = btn.parentElement; 
+            const boyBtn = container.querySelector('.tab-btn.boy');
+            const girlBtn = container.querySelector('.tab-btn.girl');
+            boyBtn.classList.remove('active'); girlBtn.classList.remove('active');
+            document.getElementById(boyPanelId)?.classList.add('hidden'); document.getElementById(girlPanelId)?.classList.add('hidden');
+            if (gender === 'boy') { boyBtn.classList.add('active'); document.getElementById(boyPanelId)?.classList.remove('hidden'); } 
+            else { girlBtn.classList.add('active'); document.getElementById(girlPanelId)?.classList.remove('hidden'); }
         }
-
-        function changeSort(mode) { currentSort = mode; renderAll(); }
 
         window.toggleBubble = function(e, div) {
             if(e) { e.stopPropagation(); e.preventDefault(); }
-            const p = div.querySelector('p');
-            p.classList.toggle('line-clamp-2');
+            const p = div.querySelector('p'); p.classList.toggle('line-clamp-2');
             setTimeout(() => { map.eachLayer(l => { if(l instanceof L.Popup && l.isOpen()) l.update(); }); }, 10);
         };
 
@@ -463,226 +477,192 @@
             const targetZoom = 16;
             const mapHeight = map.getSize().y;
             map.closePopup();
-
             const isMobile = window.innerWidth < 768;
             const offsetRatio = isMobile ? 0.1 : 0; 
-
             const point = map.project([lat, lng], targetZoom);
             const targetPoint = L.point(point.x, point.y - (mapHeight * offsetRatio)); 
             const newCenter = map.unproject(targetPoint, targetZoom);
-            
             const dist = map.distance(map.getCenter(), newCenter);
             if (dist < 50) { if (callback) callback(); return; }
-
             map.flyTo(newCenter, targetZoom, { animate: true, duration: 0.6 });
             map.once('moveend', function() { setTimeout(() => { if (callback) callback(); }, 150); });
         }
-
+        
         function fitAllMarkers() {
-            if (markers.length > 0) {
-                const group = new L.featureGroup(markers);
-                map.fitBounds(group.getBounds().pad(0.1));
-            } else {
-                map.setView([25.07, 121.51], 12);
-            }
+            if (markers.length > 0) { const group = new L.featureGroup(markers); map.fitBounds(group.getBounds().pad(0.1)); }
+            else { map.setView([25.07, 121.51], 12); }
         }
 
-        async function fetchData() {
-            showLoading(true);
-            try {
-                const response = await fetch(`${API_URL}?action=read&t=${new Date().getTime()}`);
-                if (!response.ok) throw new Error('Network error');
-                spots = await response.json();
-                renderAll();
-            } catch (error) { alert("讀取失敗：" + error.message); } 
-            finally { showLoading(false); }
-        }
+        function getHeartIcon() { return L.divIcon({ className: 'heart-icon-div', html: '<i class="fa-solid fa-heart heart-marker"></i>', iconSize: [38, 38], iconAnchor: [19, 36], popupAnchor: [0, -40] }); }
 
-        async function sendData(action, data) {
-            showLoading(true);
-            try {
-                const response = await fetch(`${API_URL}?action=${action}`, {
-                    method: 'POST', body: JSON.stringify(data), headers: { "Content-Type": "text/plain;charset=utf-8" }
-                });
-                const result = await response.json();
-                if (result.status === "success") { await fetchData(); closeModal(); }
-                else { throw new Error(result.message); }
-            } catch (error) { alert("儲存失敗：" + error.message); }
-            finally { showLoading(false); }
-        }
-
-        function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([25.07, 121.51], 12);
-            map.invalidateSize(); 
-            
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; CARTO', maxZoom: 20
-            }).addTo(map);
-
-            map.on('click', onMapClick);
-            
-            map.on('popupopen', function(e) {
-                const popup = e.popup;
-                setTimeout(() => { popup.update(); }, 10);
-            });
-
-            fetchData();
-
-            const controls = document.getElementById('mobile-controls');
-            if (window.innerWidth < 768) {
-                controls.style.bottom = '320px'; // 修正：初始位置 320px
-            } else {
-                controls.style.bottom = '24px';
-            }
-        }
-
-        function getHeartIcon() {
-            return L.divIcon({ className: 'heart-icon-div', html: '<i class="fa-solid fa-heart heart-marker"></i>', iconSize: [38, 38], iconAnchor: [19, 36], popupAnchor: [0, -40] });
-        }
-
-        function renderAll() {
+        function renderMapAll() {
             markers.forEach(m => map.removeLayer(m));
             markers = [];
             const listContainer = document.getElementById('location-list');
             listContainer.innerHTML = '';
-            document.getElementById('count-display').innerText = spots.length;
-
+            document.getElementById('map-count-display').innerText = spots.length;
             if (spots.length === 0) listContainer.innerHTML = `<div class="p-10 text-center text-slate-300 col-span-1">尚無回憶，點擊地圖新增！</div>`;
-
-            let sortedSpots = [...spots];
-            sortedSpots.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let sortedSpots = [...spots].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedSpots.forEach(spot => {
+                const imageHtml = spot.image ? `<img src="${spot.image}" class="w-full h-32 object-cover rounded-lg mb-2">` : '';
+                const cardImageHtml = spot.image ? `<img src="${spot.image}" class="w-full h-40 object-cover rounded-lg mb-3">` : '';
+
                 const popupContent = `
                     <div class="font-sans w-[280px] p-3 bg-white relative">
                         <div class="mb-2 border-b border-slate-100 pb-2 pr-24">
                             <h3 class="font-bold text-slate-800 text-lg leading-tight break-words">${spot.name}</h3>
-                            <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
-                                <i class="fa-regular fa-calendar"></i><span>${spot.date}</span>
-                            </div>
+                            <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div>
                         </div>
-                        
                         <div class="absolute top-2.5 right-10 flex gap-1">
                             <a href="https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}" target="_blank" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 transition" title="導航"><i class="fa-solid fa-location-arrow text-sm"></i></a>
                             <button onclick="editSpot(${spot.id})" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-themeMain hover:text-white transition" title="編輯"><i class="fa-solid fa-pen text-sm"></i></button>
                         </div>
-
+                        ${imageHtml}
                         <div class="space-y-2 mb-1 max-h-[220px] overflow-y-auto custom-scroll pr-1">
-                            <div class="flex gap-2 items-start">
-                                <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div>
-                                <div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition">
-                                    <p class="break-words !m-0 whitespace-pre-line line-clamp-2 transition-all duration-300">${spot.note_boy || '...'}</p>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 items-start flex-row-reverse">
-                                <div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div>
-                                <div class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition">
-                                    <p class="break-words !m-0 text-left whitespace-pre-line line-clamp-2 transition-all duration-300">${spot.note_girl || '...'}</p>
-                                </div>
-                            </div>
+                            <div class="flex gap-2 items-start"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div><div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition"><p class="break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p></div></div>
+                            <div class="flex gap-2 items-start flex-row-reverse"><div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div><div onclick="toggleBubble(event, this)" class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition"><p class="break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p></div></div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
 
-                const marker = L.marker([spot.lat, spot.lng], { icon: getHeartIcon() })
-                    .addTo(map)
-                    .bindPopup(popupContent, { maxWidth: 320, minWidth: 280, autoPan: false });
-                
+                const marker = L.marker([spot.lat, spot.lng], { icon: getHeartIcon() }).addTo(map).bindPopup(popupContent, { maxWidth: 320, minWidth: 280, autoPan: false });
                 marker.off('click');
                 marker.on('click', function() { flyToSpot(spot.lat, spot.lng, () => { this.openPopup(); }); });
                 markers.push(marker);
 
                 const card = document.createElement('div');
-                card.className = "cute-card p-4 cursor-pointer group hover:border-themeMain transition-all bg-white border border-slate-100 rounded-xl shadow-sm flex flex-col justify-between min-h-[165px] md:h-auto md:min-h-0";
-                
+                card.className = "cute-card p-4 cursor-pointer group hover:border-themeMain transition-all bg-white border border-slate-100 rounded-xl shadow-sm mb-5 md:mb-[-1px] min-h-[165px] flex flex-col justify-between md:h-auto md:min-h-0 md:block";
                 card.onclick = (e) => {
                     if(e.target.closest('button')) return;
-                    if (window.innerWidth < 768 && isSheetExpanded) {
-                        toggleSheet();
-                    }
+                    if (window.innerWidth < 768 && isSheetExpanded) toggleSheet();
                     flyToSpot(spot.lat, spot.lng, () => { marker.openPopup(); });
                 };
-
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-3">
-                        <div class="flex-1 w-full overflow-hidden">
-                            <h3 class="font-bold text-slate-700 text-lg group-hover:text-themeMain transition truncate">${spot.name}</h3>
-                            <div class="flex items-center gap-1 text-xs text-slate-400 mt-1"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div>
-                        </div>
-                        <div class="flex gap-2 opacity-80">
-                            <button onclick="editSpot(${spot.id})" class="text-slate-400 hover:text-themeMain"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteSpot(${spot.id})" class="text-slate-400 hover:text-themePink"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
+                        <div class="flex-1 w-full overflow-hidden"><h3 class="font-bold text-slate-700 text-lg group-hover:text-themeMain transition truncate">${spot.name}</h3><div class="flex items-center gap-1 text-xs text-slate-400 mt-1"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div></div>
+                        <div class="flex gap-2 opacity-80"><button onclick="editSpot(${spot.id})" class="text-slate-400 hover:text-themeMain"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSpot(${spot.id})" class="text-slate-400 hover:text-themePink"><i class="fa-solid fa-trash-can"></i></button></div>
                     </div>
-                    <div class="space-y-2">
+                    ${cardImageHtml}
+                    <div class="space-y-2 mt-auto">
                         <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 p-2 rounded-lg"><i class="fa-solid fa-mars text-blue-400"></i><p class="truncate flex-1">${spot.note_boy || '-'}</p></div>
                         <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 p-2 rounded-lg"><i class="fa-solid fa-venus text-themePink"></i><p class="truncate flex-1">${spot.note_girl || '-'}</p></div>
-                    </div>
-                `;
+                    </div>`;
                 listContainer.appendChild(card);
             });
         }
 
+        // Map Actions
         function onMapClick(e) { openModal('add', { lat: e.latlng.lat, lng: e.latlng.lng }); }
-        
         function openModal(mode, data = {}) {
             const modal = document.getElementById('data-modal');
-            modal.classList.remove('hidden'); switchTab('boy');
+            modal.classList.remove('hidden'); switchTab('boy', 'panel-boy', 'panel-girl', document.querySelector('#data-modal .tab-btn.boy'));
             
+            currentImageBase64 = ""; document.getElementById('preview-container').innerHTML = `<i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片</span>`;
             if (mode === 'add') {
-                document.getElementById('modal-title').innerText = "New Memory";
-                document.getElementById('data-form').reset();
-                document.getElementById('entry-id').value = ''; 
-                document.getElementById('entry-lat').value = data.lat;
-                document.getElementById('entry-lng').value = data.lng;
+                document.getElementById('modal-title').innerText = "New Memory"; document.getElementById('data-form').reset();
+                document.getElementById('entry-id').value = ''; document.getElementById('entry-lat').value = data.lat; document.getElementById('entry-lng').value = data.lng;
                 document.getElementById('entry-date').valueAsDate = new Date();
                 setTimeout(() => document.getElementById('entry-name').focus(), 100);
             } else {
-                document.getElementById('modal-title').innerText = "Edit Memory";
-                document.getElementById('entry-id').value = data.id;
-                document.getElementById('entry-name').value = data.name;
-                document.getElementById('entry-date').value = data.date;
-                document.getElementById('entry-lat').value = data.lat;
-                document.getElementById('entry-lng').value = data.lng;
-                document.getElementById('entry-note-boy').value = data.note_boy || '';
-                document.getElementById('entry-note-girl').value = data.note_girl || '';
+                document.getElementById('modal-title').innerText = "Edit Memory"; document.getElementById('entry-id').value = data.id;
+                document.getElementById('entry-name').value = data.name; document.getElementById('entry-date').value = data.date;
+                document.getElementById('entry-lat').value = data.lat; document.getElementById('entry-lng').value = data.lng;
+                document.getElementById('entry-note-boy').value = data.note_boy || ''; document.getElementById('entry-note-girl').value = data.note_girl || '';
+                if(data.image) { currentImageBase64 = data.image; document.getElementById('preview-container').innerHTML = `<img src="${data.image}">`; }
             }
         }
-        function closeModal() { document.getElementById('data-modal').classList.add('hidden'); }
         window.editSpot = function(id) { const spot = spots.find(s => s.id == id); if (spot) openModal('edit', spot); };
-        window.deleteSpot = function(id) { if(confirm('確定要刪除這筆回憶嗎？')) sendData('delete', { id: id }); };
-        
-        window.fitAllMarkers = function() {
-            if (markers.length > 0) {
-                const group = new L.featureGroup(markers);
-                map.fitBounds(group.getBounds().pad(0.1));
-            } else {
-                map.setView([25.07, 121.51], 12);
-            }
-        }
-
-        function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
+        window.deleteSpot = function(id) { if(confirm('確定要刪除這筆回憶嗎？')) sendData('delete', 'map', { id: id }); };
         document.getElementById('data-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const id = document.getElementById('entry-id').value;
-            const data = {
-                id: id ? id : Date.now().toString(),
+            sendData(document.getElementById('entry-id').value ? 'update' : 'create', 'map', {
+                id: document.getElementById('entry-id').value || Date.now().toString(),
                 name: document.getElementById('entry-name').value, date: document.getElementById('entry-date').value,
                 lat: document.getElementById('entry-lat').value, lng: document.getElementById('entry-lng').value,
-                note_boy: document.getElementById('entry-note-boy').value, note_girl: document.getElementById('entry-note-girl').value
-            };
-            sendData(id ? 'update' : 'create', data);
+                note_boy: document.getElementById('entry-note-boy').value, note_girl: document.getElementById('entry-note-girl').value, image: currentImageBase64
+            }, 'data-modal');
         });
+
+        // Diary
+        function setDiaryAuthor(gender) {
+            currentDiaryAuthor = gender;
+            const boyBtn = document.getElementById('diary-btn-boy');
+            const girlBtn = document.getElementById('diary-btn-girl');
+            if(gender === 'boy') { boyBtn.classList.add('active'); girlBtn.classList.remove('active'); } 
+            else { girlBtn.classList.add('active'); boyBtn.classList.remove('active'); }
+        }
+
+        function renderDiaryAll() {
+            const container = document.getElementById('diary-list'); container.innerHTML = '';
+            if (diaries.length === 0) { container.innerHTML = `<div class="text-center text-slate-400 py-10">還沒有日記喔，快來寫下第一篇吧！</div>`; return; }
+            const sortedDiaries = [...diaries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            sortedDiaries.forEach(diary => {
+                const isBoy = diary.author === 'boy';
+                const authorColor = isBoy ? 'text-blue-500' : 'text-themePink';
+                const authorBg = isBoy ? 'bg-blue-50' : 'bg-pink-50';
+                const authorIcon = isBoy ? 'fa-mars' : 'fa-venus';
+                let imgsHtml = '';
+                if(diary.images && diary.images.length > 0) {
+                    const containerClass = diary.images.length > 1 ? 'diary-images-container multi' : 'diary-images-container';
+                    const imgs = diary.images.map((src, idx) => `
+                        <div class="diary-img-wrapper" onclick="openLightbox(${JSON.stringify(diary.images).replace(/"/g, '&quot;')}, ${idx})">
+                            <img src="${src}" class="diary-img">
+                        </div>
+                    `).join('');
+                    imgsHtml = `<div class="${containerClass}">${imgs}</div>`;
+                }
+                const card = document.createElement('div'); card.className = "diary-card";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="${authorBg} ${authorColor} w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm"><i class="fa-solid ${authorIcon}"></i></div>
+                            <div class="flex flex-col"><span class="text-sm font-bold text-slate-700">${diary.date}</span></div>
+                        </div>
+                        <div class="flex gap-2"><button onclick="openDiaryModal('edit', '${diary.id}')" class="text-slate-300 hover:text-themeMain transition"><i class="fa-solid fa-pen"></i></button><button onclick="deleteDiary('${diary.id}')" class="text-slate-300 hover:text-themePink transition"><i class="fa-solid fa-trash-can"></i></button></div>
+                    </div>
+                    ${imgsHtml}
+                    <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">${diary.content}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openDiaryModal(mode, id) {
+            const modal = document.getElementById('diary-modal'); modal.classList.remove('hidden');
+            document.getElementById('diary-preview-container').innerHTML = `<i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片</span>`;
+            currentDiaryImages = [];
+            if (mode === 'add') {
+                document.getElementById('diary-modal-title').innerText = "New Diary"; document.getElementById('diary-form').reset();
+                document.getElementById('diary-id').value = ''; document.getElementById('diary-date').valueAsDate = new Date(); setDiaryAuthor('boy');
+            } else {
+                const diary = diaries.find(d => d.id == id); document.getElementById('diary-modal-title').innerText = "Edit Diary";
+                document.getElementById('diary-id').value = diary.id; document.getElementById('diary-date').value = diary.date; document.getElementById('diary-content').value = diary.content; setDiaryAuthor(diary.author || 'boy');
+                if(diary.images && diary.images.length > 0) {
+                    currentDiaryImages = diary.images; const container = document.getElementById('diary-preview-container'); container.innerHTML = '';
+                    diary.images.forEach(base64 => {
+                        const div = document.createElement('div'); div.className = "w-20 h-20 rounded-lg overflow-hidden relative border border-slate-200 flex-shrink-0";
+                        div.innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`; container.appendChild(div);
+                    });
+                }
+            }
+        }
+        window.deleteDiary = function(id) { if(confirm('確定要刪除這篇日記嗎？')) sendData('delete', 'diary', { id: id }); };
+        document.getElementById('diary-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendData(document.getElementById('diary-id').value ? 'update' : 'create', 'diary', {
+                id: document.getElementById('diary-id').value || Date.now().toString(),
+                date: document.getElementById('diary-date').value, content: document.getElementById('diary-content').value,
+                images: currentDiaryImages, author: currentDiaryAuthor
+            }, 'diary-modal');
+        });
+
         window.onload = initMap;
         window.addEventListener('resize', () => {
-            if (map) {
+            if (map && currentView === 'map') {
                 map.invalidateSize();
                 const controls = document.getElementById('mobile-controls');
-                if (window.innerWidth < 768) {
-                    controls.style.bottom = '320px';
-                } else {
-                    controls.style.bottom = '24px';
-                }
+                if (window.innerWidth < 768) controls.style.bottom = '380px'; else controls.style.bottom = '24px';
             }
         });
     </script>
