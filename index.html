@@ -64,10 +64,10 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 20; display: flex; flex-direction: column; transition: height 0.3s ease;
         }
 
-        /* Mobile Controls: 位置調整至 380px */
+        /* Mobile Controls */
         #mobile-controls {
             position: absolute; 
-            bottom: 380px; /* 修改：下調 */
+            bottom: 380px; 
             left: 50%; transform: translateX(-50%); z-index: 40; 
             display: flex; align-items: center; gap: 12px; padding: 8px 16px;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 999px; 
@@ -147,7 +147,7 @@
         <div class="absolute bottom-6 text-white text-sm tracking-widest" id="lightbox-counter">1 / 1</div>
     </div>
 
-    <!-- ===== View 1: Map ===== -->
+    <!-- View 1: Map -->
     <div id="view-map" class="view-section active">
         <nav class="absolute top-4 left-4 right-4 h-14 bg-white/90 backdrop-blur-md rounded-full shadow-lg z-30 flex items-center justify-between px-5 md:hidden">
             <div class="flex items-center gap-2"><i class="fa-solid fa-heart text-themePink text-xl"></i><h1 class="text-lg font-bold text-slate-700 font-cute">Our Love Map</h1></div>
@@ -381,11 +381,14 @@
             finally { showLoading(false); }
         }
 
-        // === MAP FUNCTIONS ===
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([25.07, 121.51], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 20 }).addTo(map);
             L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋...', errorMessage: 'Not Found' }).on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
+            
+            // ★ 功能回歸：點擊地圖也能新增 (開啟 modal)
+            map.on('click', onMapClick);
+
             map.on('popupopen', function(e) { setTimeout(() => { e.popup.update(); }, 10); });
             fetchData('map');
             const controls = document.getElementById('mobile-controls');
@@ -396,14 +399,14 @@
             const sheet = document.querySelector('.mobile-sheet');
             const controls = document.getElementById('mobile-controls');
             if (window.innerWidth >= 768) return;
-            if (sheet.style.height === '85%') { 
+            if (sheet.style.height === '70%') { 
                 sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '380px';
             } else { 
-                sheet.style.height = '85%'; controls.classList.add('hidden-fade'); controls.style.pointerEvents = 'none'; 
+                sheet.style.height = '70%'; controls.classList.add('hidden-fade'); controls.style.pointerEvents = 'none'; 
             }
             isSheetExpanded = !isSheetExpanded;
         }
-        
+
         function toggleCustomSearch(e) {
              if (e) e.stopPropagation();
             const wrapper = document.getElementById('custom-search-wrapper');
@@ -411,6 +414,7 @@
             const searchButton = document.getElementById('search-toggle-btn');
             const controlsGroup = document.getElementById('controls-group');
             const resultList = document.getElementById('search-results');
+
             if (wrapper.classList.contains('expanded')) {
                 wrapper.classList.remove('expanded'); controlsGroup.classList.remove('hidden-force'); 
                 searchButton.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>'; input.value = ''; input.blur(); resultList.style.display = 'none';
@@ -546,6 +550,38 @@
                 listContainer.appendChild(card);
             });
         }
+
+        // Map Actions
+        function onMapClick(e) { openModal('add', { lat: e.latlng.lat, lng: e.latlng.lng }); }
+        function openModal(mode, data = {}) {
+            const modal = document.getElementById('data-modal');
+            modal.classList.remove('hidden'); switchTab('boy', 'panel-boy', 'panel-girl', document.querySelector('#data-modal .tab-btn.boy'));
+            
+            currentImageBase64 = ""; document.getElementById('preview-container').innerHTML = `<i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片 (單張)</span>`;
+            if (mode === 'add') {
+                document.getElementById('modal-title').innerText = "New Memory"; document.getElementById('data-form').reset();
+                document.getElementById('entry-id').value = ''; document.getElementById('entry-lat').value = data.lat; document.getElementById('entry-lng').value = data.lng;
+                document.getElementById('entry-date').valueAsDate = new Date();
+                setTimeout(() => document.getElementById('entry-name').focus(), 100);
+            } else {
+                document.getElementById('modal-title').innerText = "Edit Memory"; document.getElementById('entry-id').value = data.id;
+                document.getElementById('entry-name').value = data.name; document.getElementById('entry-date').value = data.date;
+                document.getElementById('entry-lat').value = data.lat; document.getElementById('entry-lng').value = data.lng;
+                document.getElementById('entry-note-boy').value = data.note_boy || ''; document.getElementById('entry-note-girl').value = data.note_girl || '';
+                if(data.image) { currentImageBase64 = data.image; document.getElementById('preview-container').innerHTML = `<img src="${data.image}">`; }
+            }
+        }
+        window.editSpot = function(id) { const spot = spots.find(s => s.id == id); if (spot) openModal('edit', spot); };
+        window.deleteSpot = function(id) { if(confirm('確定要刪除這筆回憶嗎？')) sendData('delete', 'map', { id: id }); };
+        document.getElementById('data-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendData(document.getElementById('entry-id').value ? 'update' : 'create', 'map', {
+                id: document.getElementById('entry-id').value || Date.now().toString(),
+                name: document.getElementById('entry-name').value, date: document.getElementById('entry-date').value,
+                lat: document.getElementById('entry-lat').value, lng: document.getElementById('entry-lng').value,
+                note_boy: document.getElementById('entry-note-boy').value, note_girl: document.getElementById('entry-note-girl').value, image: currentImageBase64
+            }, 'data-modal');
+        });
 
         // Diary
         function setDiaryAuthor(gender) {
