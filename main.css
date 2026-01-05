@@ -1,0 +1,2 @@
+.diary-images-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; }
+.diary-images-container img { aspect-ratio: 1 /1; object-fit: cover; }

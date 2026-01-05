@@ -67,12 +67,12 @@
         /* Mobile Controls */
         #mobile-controls {
             position: absolute; 
-            bottom: 380px; 
+            bottom: 420px; 
             left: 50%; transform: translateX(-50%); z-index: 40; 
             display: flex; align-items: center; gap: 12px; padding: 8px 16px;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 999px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid rgba(200,200,200,0.4); 
-            transition: all 0.3s ease-out; min-width: 220px; justify-content: space-between;
+            transition: all 0.3s ease-out; min-width: 280px; justify-content: space-between;
         }
         #mobile-controls.hidden-fade { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
         #mobile-controls button { width: 40px; height: 40px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
@@ -101,11 +101,23 @@
 
         /* Diary Styles */
         .diary-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; position: relative; }
-        .diary-images-container { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
-        .diary-img-wrapper { flex: 0 0 100%; scroll-snap-align: start; position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }
-        .diary-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
-        .diary-img:hover { transform: scale(1.02); }
-        .diary-images-container.multi .diary-img-wrapper { flex: 0 0 85%; } 
+        
+        /* 滾動式多圖 (Popup) */
+        .scrolling-images { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 12px; scroll-snap-type: x mandatory; padding-bottom: 4px; }
+        .scrolling-img-item { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; cursor: pointer; }
+        .scrolling-images.multi .scrolling-img-item { flex: 0 0 85%; }
+        .scrolling-img-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 網格縮圖 (Card - 5列) */
+        .grid-images-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; }
+        .grid-img-item { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; }
+
+        /* 預覽容器 (上傳時) */
+        .preview-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .preview-img-wrapper { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
+        .preview-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-remove-btn { position: absolute; inset: 0; background: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+        .preview-img-wrapper:hover .preview-remove-btn { opacity: 1; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; items-center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; transition: all 0.2s; }
@@ -127,7 +139,9 @@
             .diary-container { max-width: 600px; margin: 0 auto; padding-top: 20px; }
             .cute-card { min-height: 0; display: block; }
         }
+        
     </style>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body class="text-slate-600 font-sans">
 
@@ -147,7 +161,7 @@
         <div class="absolute bottom-6 text-white text-sm tracking-widest" id="lightbox-counter">1 / 1</div>
     </div>
 
-    <!-- View 1: Map -->
+    <!-- ===== View 1: Map ===== -->
     <div id="view-map" class="view-section active">
         <nav class="absolute top-4 left-4 right-4 h-14 bg-white/90 backdrop-blur-md rounded-full shadow-lg z-30 flex items-center justify-between px-5 md:hidden">
             <div class="flex items-center gap-2"><i class="fa-solid fa-heart text-themePink text-xl"></i><h1 class="text-lg font-bold text-slate-700 font-cute">Our Love Map</h1></div>
@@ -205,8 +219,10 @@
                     <!-- Image Input for Map -->
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photo</label>
-                        <input type="file" id="entry-image" accept="image/*" class="hidden" onchange="previewSingleImage(this, 'preview-container')">
-                        <div id="preview-container" class="w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-themeMain transition" onclick="document.getElementById('entry-image').click()"><i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片 (單張)</span></div>
+                        <input type="file" id="entry-image" accept="image/*" multiple class="hidden" onchange="previewMapImages(this)">
+                        <div id="map-preview-container" class="preview-grid w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[80px] cursor-pointer hover:border-themeMain transition items-center justify-center" onclick="document.getElementById('entry-image').click()">
+                            <div class="flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-camera text-2xl mb-2"></i><span class="text-xs font-bold">上傳照片 (多張)</span></div>
+                        </div>
                     </div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Location</label><input type="text" id="entry-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-bold focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label><input type="date" id="entry-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
@@ -240,7 +256,9 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photos (Multiple)</label>
                         <input type="file" id="diary-image-input" accept="image/*" multiple class="hidden" onchange="previewMultiImages(this)">
-                        <div id="diary-preview-container" class="w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[100px] cursor-pointer hover:border-themeMain transition" onclick="document.getElementById('diary-image-input').click()"><div class="w-full flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-images text-2xl mb-2"></i><span class="text-xs font-bold">點擊上傳多張照片</span></div></div>
+                        <div id="diary-preview-container" class="preview-grid w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[80px] cursor-pointer hover:border-themeMain transition" onclick="document.getElementById('diary-image-input').click()">
+                            <div class="w-full flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-images text-2xl mb-2"></i><span class="text-xs font-bold">點擊上傳多張照片</span></div>
+                        </div>
                     </div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label><input type="date" id="diary-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Content</label><textarea id="diary-content" rows="5" required placeholder="紀錄今天的小日子..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-themeMain focus:border-transparent resize-none"></textarea></div>
@@ -264,9 +282,9 @@
         let isSheetExpanded = false;
         let searchTimeout; 
         let tempSearchMarker;
-        let currentImageBase64 = "";
         let currentView = 'map';
         
+        let currentMapImages = []; 
         let currentDiaryAuthor = 'boy';
         let currentDiaryImages = []; 
         let lightboxImages = [];
@@ -287,30 +305,84 @@
             }
         }
 
-        function previewSingleImage(input, containerId) {
-            if (input.files && input.files[0]) {
-                processImage(input.files[0], (base64) => {
-                    currentImageBase64 = base64;
-                    document.getElementById(containerId).innerHTML = `<img src="${base64}" class="w-full h-auto rounded-lg object-cover">`;
+        // Map Image Preview (Multi)
+        function previewMapImages(input) {
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    processImage(file, (base64) => {
+                        currentMapImages.push(base64);
+                        renderMapPreview();
+                    });
                 });
             }
         }
 
+        function renderMapPreview() {
+             const previewDiv = document.getElementById('map-preview-container');
+             previewDiv.innerHTML = '';
+             if(currentMapImages.length === 0) {
+                 previewDiv.innerHTML = `<div class="flex flex-col items-center justify-center text-slate-400 w-full"><i class="fa-solid fa-camera text-2xl mb-2"></i><span class="text-xs font-bold">上傳照片 (多張)</span></div>`;
+                 return;
+             }
+             currentMapImages.forEach((base64, index) => {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = "preview-img-wrapper relative group";
+                imgDiv.innerHTML = `
+                    <img src="${base64}">
+                    <div class="preview-remove-btn" onclick="removeMapImage(${index})"><i class="fa-solid fa-trash"></i></div>
+                `;
+                previewDiv.appendChild(imgDiv);
+             });
+             const addBtn = document.createElement('div');
+             addBtn.className = "preview-img-wrapper flex items-center justify-center bg-slate-50 cursor-pointer text-slate-400 hover:text-themeMain hover:border-themeMain";
+             addBtn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+             addBtn.onclick = (e) => { e.stopPropagation(); document.getElementById('entry-image').click(); };
+             previewDiv.appendChild(addBtn);
+        }
+
+        function removeMapImage(index) {
+            currentMapImages.splice(index, 1);
+            renderMapPreview();
+        }
+
+        // Diary Image Preview (Multi)
         function previewMultiImages(input) {
             if (input.files) {
-                const container = document.getElementById('diary-preview-container');
-                container.innerHTML = '';
-                currentDiaryImages = []; 
                 Array.from(input.files).forEach(file => {
                     processImage(file, (base64) => {
                         currentDiaryImages.push(base64);
-                        const imgDiv = document.createElement('div');
-                        imgDiv.className = "w-20 h-20 rounded-lg overflow-hidden relative border border-slate-200 flex-shrink-0";
-                        imgDiv.innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
-                        container.appendChild(imgDiv);
+                        renderDiaryPreview();
                     });
                 });
             }
+        }
+
+        function renderDiaryPreview() {
+            const container = document.getElementById('diary-preview-container');
+            container.innerHTML = '';
+            if(currentDiaryImages.length === 0) {
+                container.innerHTML = `<div class="flex flex-col items-center justify-center text-slate-400 w-full"><i class="fa-solid fa-images text-2xl mb-2"></i><span class="text-xs font-bold">點擊上傳多張</span></div>`;
+                return;
+            }
+            currentDiaryImages.forEach((base64, index) => {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = "preview-img-wrapper relative group";
+                imgDiv.innerHTML = `
+                    <img src="${base64}">
+                    <div class="preview-remove-btn" onclick="removeDiaryImage(${index})"><i class="fa-solid fa-trash"></i></div>
+                `;
+                container.appendChild(imgDiv);
+            });
+            const addBtn = document.createElement('div');
+             addBtn.className = "preview-img-wrapper flex items-center justify-center bg-slate-50 cursor-pointer text-slate-400 hover:text-themeMain hover:border-themeMain";
+             addBtn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+             addBtn.onclick = (e) => { e.stopPropagation(); document.getElementById('diary-image-input').click(); };
+             container.appendChild(addBtn);
+        }
+
+        function removeDiaryImage(index) {
+            currentDiaryImages.splice(index, 1);
+            renderDiaryPreview();
         }
 
         function processImage(file, callback) {
@@ -386,13 +458,12 @@
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 20 }).addTo(map);
             L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋...', errorMessage: 'Not Found' }).on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
             
-            // ★ 功能回歸：點擊地圖也能新增 (開啟 modal)
             map.on('click', onMapClick);
 
             map.on('popupopen', function(e) { setTimeout(() => { e.popup.update(); }, 10); });
             fetchData('map');
             const controls = document.getElementById('mobile-controls');
-            if (window.innerWidth < 768) controls.style.bottom = '380px'; else controls.style.bottom = '24px';
+            if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
         }
 
         function toggleSheet() {
@@ -400,7 +471,7 @@
             const controls = document.getElementById('mobile-controls');
             if (window.innerWidth >= 768) return;
             if (sheet.style.height === '70%') { 
-                sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '380px';
+                sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '420px';
             } else { 
                 sheet.style.height = '70%'; controls.classList.add('hidden-fade'); controls.style.pointerEvents = 'none'; 
             }
@@ -505,8 +576,26 @@
             let sortedSpots = [...spots].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedSpots.forEach(spot => {
-                const imageHtml = spot.image ? `<img src="${spot.image}" class="w-full h-32 object-cover rounded-lg mb-2">` : '';
-                const cardImageHtml = spot.image ? `<img src="${spot.image}" class="w-full h-40 object-cover rounded-lg mb-3">` : '';
+                let images = spot.image || [];
+                if (!Array.isArray(images) && images) images = [images];
+
+                let imgsHtml = '';
+                if(images.length > 0) {
+                    const containerClass = 'scrolling-images' + (images.length > 1 ? ' multi' : '');
+                    const imgItems = images.map((src, idx) => 
+                        `<div class="scrolling-img-item" onclick="openLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${idx})"><img src="${src}"></div>`
+                    ).join('');
+                    imgsHtml = `<div class="${containerClass}">${imgItems}</div>`;
+                }
+
+                // Card Grid Images (Map)
+                let cardImgsHtml = '';
+                if(images.length > 0) {
+                     const imgItems = images.map((src, idx) => 
+                        `<img src="${src}" class="grid-img-item" onclick="openLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${idx})">`
+                    ).join('');
+                    cardImgsHtml = `<div class="grid-images-5">${imgItems}</div>`;
+                }
 
                 const popupContent = `
                     <div class="font-sans w-[280px] p-3 bg-white relative">
@@ -518,7 +607,7 @@
                             <a href="https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}" target="_blank" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 transition" title="導航"><i class="fa-solid fa-location-arrow text-sm"></i></a>
                             <button onclick="editSpot(${spot.id})" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-themeMain hover:text-white transition" title="編輯"><i class="fa-solid fa-pen text-sm"></i></button>
                         </div>
-                        ${imageHtml}
+                        ${imgsHtml}
                         <div class="space-y-2 mb-1 max-h-[220px] overflow-y-auto custom-scroll pr-1">
                             <div class="flex gap-2 items-start"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div><div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition"><p class="break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p></div></div>
                             <div class="flex gap-2 items-start flex-row-reverse"><div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div><div onclick="toggleBubble(event, this)" class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition"><p class="break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p></div></div>
@@ -533,7 +622,7 @@
                 const card = document.createElement('div');
                 card.className = "cute-card p-4 cursor-pointer group hover:border-themeMain transition-all bg-white border border-slate-100 rounded-xl shadow-sm mb-5 md:mb-[-1px] min-h-[165px] flex flex-col justify-between md:h-auto md:min-h-0 md:block";
                 card.onclick = (e) => {
-                    if(e.target.closest('button')) return;
+                    if(e.target.closest('button') || e.target.tagName === 'IMG') return;
                     if (window.innerWidth < 768 && isSheetExpanded) toggleSheet();
                     flyToSpot(spot.lat, spot.lng, () => { marker.openPopup(); });
                 };
@@ -542,7 +631,7 @@
                         <div class="flex-1 w-full overflow-hidden"><h3 class="font-bold text-slate-700 text-lg group-hover:text-themeMain transition truncate">${spot.name}</h3><div class="flex items-center gap-1 text-xs text-slate-400 mt-1"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div></div>
                         <div class="flex gap-2 opacity-80"><button onclick="editSpot(${spot.id})" class="text-slate-400 hover:text-themeMain"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSpot(${spot.id})" class="text-slate-400 hover:text-themePink"><i class="fa-solid fa-trash-can"></i></button></div>
                     </div>
-                    ${cardImageHtml}
+                    ${cardImgsHtml}
                     <div class="space-y-2 mt-auto">
                         <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 p-2 rounded-lg"><i class="fa-solid fa-mars text-blue-400"></i><p class="truncate flex-1">${spot.note_boy || '-'}</p></div>
                         <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 p-2 rounded-lg"><i class="fa-solid fa-venus text-themePink"></i><p class="truncate flex-1">${spot.note_girl || '-'}</p></div>
@@ -553,11 +642,14 @@
 
         // Map Actions
         function onMapClick(e) { openModal('add', { lat: e.latlng.lat, lng: e.latlng.lng }); }
+        
         function openModal(mode, data = {}) {
             const modal = document.getElementById('data-modal');
             modal.classList.remove('hidden'); switchTab('boy', 'panel-boy', 'panel-girl', document.querySelector('#data-modal .tab-btn.boy'));
             
-            currentImageBase64 = ""; document.getElementById('preview-container').innerHTML = `<i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片 (單張)</span>`;
+            currentMapImages = []; 
+            document.getElementById('map-preview-container').innerHTML = `<div class="flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-camera text-2xl mb-2"></i><span class="text-xs font-bold">上傳照片 (多張)</span></div>`;
+            
             if (mode === 'add') {
                 document.getElementById('modal-title').innerText = "New Memory"; document.getElementById('data-form').reset();
                 document.getElementById('entry-id').value = ''; document.getElementById('entry-lat').value = data.lat; document.getElementById('entry-lng').value = data.lng;
@@ -568,7 +660,15 @@
                 document.getElementById('entry-name').value = data.name; document.getElementById('entry-date').value = data.date;
                 document.getElementById('entry-lat').value = data.lat; document.getElementById('entry-lng').value = data.lng;
                 document.getElementById('entry-note-boy').value = data.note_boy || ''; document.getElementById('entry-note-girl').value = data.note_girl || '';
-                if(data.image) { currentImageBase64 = data.image; document.getElementById('preview-container').innerHTML = `<img src="${data.image}">`; }
+                
+                // ★ 修正：編輯時載入舊圖片並顯示
+                let existingImages = data.image || [];
+                if(!Array.isArray(existingImages) && existingImages) existingImages = [existingImages];
+                
+                if(existingImages.length > 0) {
+                    currentMapImages = existingImages;
+                    renderMapPreview(); // 呼叫預覽渲染
+                }
             }
         }
         window.editSpot = function(id) { const spot = spots.find(s => s.id == id); if (spot) openModal('edit', spot); };
@@ -579,7 +679,7 @@
                 id: document.getElementById('entry-id').value || Date.now().toString(),
                 name: document.getElementById('entry-name').value, date: document.getElementById('entry-date').value,
                 lat: document.getElementById('entry-lat').value, lng: document.getElementById('entry-lng').value,
-                note_boy: document.getElementById('entry-note-boy').value, note_girl: document.getElementById('entry-note-girl').value, image: currentImageBase64
+                note_boy: document.getElementById('entry-note-boy').value, note_girl: document.getElementById('entry-note-girl').value, image: currentMapImages
             }, 'data-modal');
         });
 
@@ -661,7 +761,7 @@
             if (map && currentView === 'map') {
                 map.invalidateSize();
                 const controls = document.getElementById('mobile-controls');
-                if (window.innerWidth < 768) controls.style.bottom = '380px'; else controls.style.bottom = '24px';
+                if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
             }
         });
     </script>
