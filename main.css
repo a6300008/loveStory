@@ -5,3 +5,10 @@
         display: block;
     }
 }
+#diary-preview-container .flex.flex-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    justify-content: center;
+    align-items: center;
+}

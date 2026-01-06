@@ -573,7 +573,7 @@
             document.getElementById('map-count-display').innerText = spots.length;
             if (spots.length === 0) listContainer.innerHTML = `<div class="p-10 text-center text-slate-300 col-span-1">尚無回憶，點擊地圖新增！</div>`;
             
-            let sortedSpots = [...spots].sort((a, b) => new Date(b.date) - new Date(a.date));
+            let sortedSpots = [...spots].sort((a, b) => b.id - a.id);
 
             sortedSpots.forEach(spot => {
                 let images = spot.image || [];
@@ -729,7 +729,7 @@
 
         function openDiaryModal(mode, id) {
             const modal = document.getElementById('diary-modal'); modal.classList.remove('hidden');
-            document.getElementById('diary-preview-container').innerHTML = `<i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片</span>`;
+            
             currentDiaryImages = [];
             if (mode === 'add') {
                 document.getElementById('diary-modal-title').innerText = "New Diary"; document.getElementById('diary-form').reset();
