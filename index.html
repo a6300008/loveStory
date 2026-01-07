@@ -6,7 +6,6 @@
     
     <title>Our Love Map 📍 Mapping Every Date & Memory Together</title>
     
-    <!-- 引入外部 API 設定 -->
     <script src="api.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -55,7 +54,6 @@
         .leaflet-popup-content p { margin: 0 !important; }
         .leaflet-container a.leaflet-popup-close-button { top: 12px; right: 12px; color: #94a3b8; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 50%; z-index: 20; }
 
-        /* Mobile Sheet */
         .mobile-sheet {
             position: absolute; height: 280px; 
             left: 20px; right: 20px; 
@@ -64,7 +62,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 20; display: flex; flex-direction: column; transition: height 0.3s ease;
         }
 
-        /* Mobile Controls */
         #mobile-controls {
             position: absolute; 
             bottom: 420px; 
@@ -72,14 +69,13 @@
             display: flex; align-items: center; gap: 12px; padding: 8px 16px;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 999px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid rgba(200,200,200,0.4); 
-            transition: all 0.3s ease-out; min-width: 280px; justify-content: space-between;
+            transition: all 0.3s ease-out; min-width: 220px; justify-content: space-between;
         }
         #mobile-controls.hidden-fade { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
         #mobile-controls button { width: 40px; height: 40px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
         #mobile-controls button:hover { background-color: #f1f5f9; color: #38bdf8; }
         #mobile-controls .divider { width: 1px; height: 28px; background: #e2e8f0; margin: 0; }
         
-        /* Search */
         #custom-search-wrapper { max-width: 0; opacity: 0; overflow: hidden; transition: max-width 0.3s ease-out, opacity 0.2s ease-out; display: flex; align-items: center; }
         #custom-search-wrapper.expanded { max-width: 310px; opacity: 1; }
         #custom-search-input { width: 100%; height: 36px; background: transparent; color: #334155; border: none; outline: none; padding: 0 8px 0 4px; font-size: 15px; }
@@ -89,7 +85,6 @@
         .controls-group { display: flex; align-items: center; gap: 12px; overflow: hidden; max-width: 200px; transition: max-width 0.3s ease; }
         .controls-group.hidden-force { max-width: 0; opacity: 0; pointer-events: none; }
 
-        /* Card Styles */
         .cute-card { 
             background: white; border: 1px solid #e2e8f0; transition: all 0.25s ease-out; position: relative; overflow: hidden; border-radius: 0.75rem;
             min-height: 165px; display: flex; flex-direction: column; justify-content: space-between;
@@ -102,17 +97,14 @@
         /* Diary Styles */
         .diary-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; position: relative; }
         
-        /* 滾動式多圖 (Popup) */
-        .scrolling-images { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 12px; scroll-snap-type: x mandatory; padding-bottom: 4px; }
-        .scrolling-img-item { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; cursor: pointer; }
-        .scrolling-images.multi .scrolling-img-item { flex: 0 0 85%; }
-        .scrolling-img-item img { width: 100%; height: 100%; object-fit: cover; }
+        .diary-images-container { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+        .diary-img-wrapper { flex: 0 0 100%; scroll-snap-align: start; position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }
+        .diary-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
+        .diary-img:hover { transform: scale(1.02); }
+        .diary-images-container.multi .diary-img-wrapper { flex: 0 0 85%; } 
 
-        /* 網格縮圖 (Card - 5列) */
         .grid-images-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; }
         .grid-img-item { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; }
-
-        /* 預覽容器 (上傳時) */
         .preview-grid { display: flex; flex-wrap: wrap; gap: 8px; }
         .preview-img-wrapper { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
         .preview-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
@@ -124,7 +116,6 @@
         .nav-item i { font-size: 20px; margin-bottom: 2px; }
         .nav-item.active { color: #38bdf8; }
 
-        /* Lightbox */
         #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; }
         #lightbox img { max-width: 100%; max-height: 80vh; object-fit: contain; }
         .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 30px; padding: 20px; cursor: pointer; z-index: 3001; }
@@ -139,8 +130,8 @@
             .diary-container { max-width: 600px; margin: 0 auto; padding-top: 20px; }
             .cute-card { min-height: 0; display: block; }
         }
-        
     </style>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body class="text-slate-600 font-sans">
 
@@ -215,9 +206,8 @@
                 <h3 class="font-bold text-xl text-slate-800 mb-5 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-themePink/10 flex items-center justify-center text-themePink"><i class="fa-solid fa-pen-nib"></i></div><span id="modal-title">Write Memory</span></h3>
                 <form id="data-form" class="space-y-4">
                     <input type="hidden" id="entry-id"><input type="hidden" id="entry-lat"><input type="hidden" id="entry-lng">
-                    <!-- Image Input for Map -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photo</label>
+                        <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photos (Multiple)</label>
                         <input type="file" id="entry-image" accept="image/*" multiple class="hidden" onchange="previewMapImages(this)">
                         <div id="map-preview-container" class="preview-grid w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[80px] cursor-pointer hover:border-themeMain transition items-center justify-center" onclick="document.getElementById('entry-image').click()">
                             <div class="flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-camera text-2xl mb-2"></i><span class="text-xs font-bold">上傳照片 (多張)</span></div>
@@ -255,7 +245,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photos (Multiple)</label>
                         <input type="file" id="diary-image-input" accept="image/*" multiple class="hidden" onchange="previewMultiImages(this)">
-                        <div id="diary-preview-container" class="preview-grid w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[80px] cursor-pointer hover:border-themeMain transition" onclick="document.getElementById('diary-image-input').click()">
+                        <div id="diary-preview-container" class="preview-grid w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[80px] cursor-pointer hover:border-themeMain transition items-center justify-center" onclick="document.getElementById('diary-image-input').click()">
                             <div class="w-full flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-images text-2xl mb-2"></i><span class="text-xs font-bold">點擊上傳多張照片</span></div>
                         </div>
                     </div>
@@ -278,7 +268,6 @@
         let spots = [];
         let diaries = [];
         let currentTab = 'boy';
-        let isSheetExpanded = false;
         let searchTimeout; 
         let tempSearchMarker;
         let currentView = 'map';
@@ -392,7 +381,7 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const MAX_WIDTH = 1206;
+                    const MAX_WIDTH = 600;
                     let width = img.width; let height = img.height;
                     if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                     canvas.width = width; canvas.height = height;
@@ -452,13 +441,12 @@
             finally { showLoading(false); }
         }
 
+        // === MAP FUNCTIONS ===
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([25.07, 121.51], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 20 }).addTo(map);
             L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋...', errorMessage: 'Not Found' }).on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
-            
             map.on('click', onMapClick);
-
             map.on('popupopen', function(e) { setTimeout(() => { e.popup.update(); }, 10); });
             fetchData('map');
             const controls = document.getElementById('mobile-controls');
@@ -474,7 +462,6 @@
             } else { 
                 sheet.style.height = '70%'; controls.classList.add('hidden-fade'); controls.style.pointerEvents = 'none'; 
             }
-            isSheetExpanded = !isSheetExpanded;
         }
 
         function toggleCustomSearch(e) {
@@ -587,7 +574,6 @@
                     imgsHtml = `<div class="${containerClass}">${imgItems}</div>`;
                 }
 
-                // Card Grid Images (Map)
                 let cardImgsHtml = '';
                 if(images.length > 0) {
                      const imgItems = images.map((src, idx) => 
@@ -622,7 +608,12 @@
                 card.className = "cute-card p-4 cursor-pointer group hover:border-themeMain transition-all bg-white border border-slate-100 rounded-xl shadow-sm mb-5 md:mb-[-1px] min-h-[165px] flex flex-col justify-between md:h-auto md:min-h-0 md:block";
                 card.onclick = (e) => {
                     if(e.target.closest('button') || e.target.tagName === 'IMG') return;
-                    if (window.innerWidth < 768 && isSheetExpanded) toggleSheet();
+                    // if (window.innerWidth < 768 && toggleSheet) toggleSheet(); // Fixed: check if toggleSheet is defined but here it is
+                     if (window.innerWidth < 768) {
+                        const sheet = document.querySelector('.mobile-sheet');
+                        // 簡單邏輯: 只要點擊卡片就展開地圖 (收縮 Sheet)
+                        if(sheet.style.height !== '280px') toggleSheet();
+                    }
                     flyToSpot(spot.lat, spot.lng, () => { marker.openPopup(); });
                 };
                 card.innerHTML = `
@@ -660,13 +651,12 @@
                 document.getElementById('entry-lat').value = data.lat; document.getElementById('entry-lng').value = data.lng;
                 document.getElementById('entry-note-boy').value = data.note_boy || ''; document.getElementById('entry-note-girl').value = data.note_girl || '';
                 
-                // ★ 修正：編輯時載入舊圖片並顯示
                 let existingImages = data.image || [];
                 if(!Array.isArray(existingImages) && existingImages) existingImages = [existingImages];
                 
                 if(existingImages.length > 0) {
                     currentMapImages = existingImages;
-                    renderMapPreview(); // 呼叫預覽渲染
+                    renderMapPreview();
                 }
             }
         }
@@ -721,14 +711,52 @@
                     </div>
                     ${imgsHtml}
                     <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">${diary.content}</div>
+                    
+                    <!-- 留言區塊 -->
+                    <div class="mt-4 pt-3 border-t border-slate-50">
+                        <div class="text-xs text-slate-400 font-bold mb-2">留言</div>
+                        <div class="space-y-2 mb-3 max-h-[150px] overflow-y-auto custom-scroll">
+                            ${(diary.comments || []).map(c => `
+                                <div class="flex gap-2 text-xs">
+                                    <span class="font-bold ${c.author === 'boy' ? 'text-blue-400' : 'text-pink-400'}">${c.author === 'boy' ? 'Boy' : 'Girl'}:</span>
+                                    <span class="text-slate-600 flex-1">${c.text}</span>
+                                    <span class="text-slate-300 text-[10px]">${c.time}</span>
+                                </div>
+                            `).join('')}
+                            ${(!diary.comments || diary.comments.length === 0) ? '<p class="text-xs text-slate-300 italic">尚無留言</p>' : ''}
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="comment-author-${diary.id}" class="text-xs border rounded px-1 py-1 text-slate-500 outline-none">
+                                <option value="boy">Boy</option>
+                                <option value="girl">Girl</option>
+                            </select>
+                            <input type="text" id="comment-input-${diary.id}" placeholder="寫下回應..." class="flex-1 text-xs border rounded-lg px-2 py-1 outline-none focus:border-themeMain bg-slate-50">
+                            <button onclick="submitComment('${diary.id}')" class="text-xs bg-slate-200 hover:bg-themeMain hover:text-white px-3 py-1 rounded-lg transition"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(card);
             });
         }
 
+        // 新增留言函式
+        function submitComment(diaryId) {
+            const author = document.getElementById(`comment-author-${diaryId}`).value;
+            const text = document.getElementById(`comment-input-${diaryId}`).value;
+            
+            if (!text.trim()) return;
+
+            // 呼叫後端 API
+            sendData('add_comment', 'diary', {
+                id: diaryId,
+                commentAuthor: author,
+                commentText: text
+            });
+        }
+
         function openDiaryModal(mode, id) {
             const modal = document.getElementById('diary-modal'); modal.classList.remove('hidden');
-            
+            document.getElementById('diary-preview-container').innerHTML = `<i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片</span>`;
             currentDiaryImages = [];
             if (mode === 'add') {
                 document.getElementById('diary-modal-title').innerText = "New Diary"; document.getElementById('diary-form').reset();
