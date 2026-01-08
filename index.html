@@ -156,7 +156,7 @@
             <div class="flex gap-2"><button onclick="fetchData('map')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-themeMain hover:text-white transition"><i class="fa-solid fa-rotate-right"></i></button></div>
         </nav>
         <nav class="hidden md:flex bg-white border-b border-slate-200 h-16 items-center justify-between px-6 z-30 shadow-sm relative">
-            <div class="flex items-center gap-2"><i class="fa-solid fa-heart text-themePink text-2xl"></i><h1 class="text-xl font-bold text-slate-700 font-cute">Our Love Map</h1></div>
+            <div class="flex items-center gap-2"><i class="fa-solid fa-heart text-themePink text-2xl"></i><h1 class="text-xl font-bold text-slate-700 font-cute">Our Love Map<small>📍 Mapping Every Date & Memory Together</small></h1></div>
             <div class="flex gap-3"><button onclick="switchView('map')" class="px-4 py-1.5 rounded-lg bg-themeMain text-white font-bold">地圖</button><button onclick="switchView('diary')" class="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-themeMain hover:text-white transition font-bold text-slate-500">日記</button></div>
         </nav>
         <div class="flex-1 flex flex-col md:flex-row h-full relative overflow-hidden">
@@ -526,7 +526,8 @@
         window.toggleBubble = function(e, div) {
             if(e) { e.stopPropagation(); e.preventDefault(); }
             const p = div.querySelector('p'); p.classList.toggle('line-clamp-2');
-            setTimeout(() => { map.eachLayer(l => { if(l instanceof L.Popup && l.isOpen()) l.update(); }); }, 10);
+            console.log(p)
+            // setTimeout(() => { map.eachLayer(l => { if(l instanceof L.Popup && l.isOpen()) l.update(); }); }, 10);
         };
 
         function flyToSpot(lat, lng, callback) {
@@ -585,7 +586,7 @@
                 }
 
                 const popupContent = `
-                    <div class="font-sans w-[280px] p-3 bg-white relative">
+                    <div class="font-sans w-[320px] p-3 bg-white relative">
                         <div class="mb-2 border-b border-slate-100 pb-2 pr-24">
                             <h3 class="font-bold text-slate-800 text-lg leading-tight break-words">${spot.name}</h3>
                             <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div>
@@ -596,8 +597,8 @@
                         </div>
                         ${imgsHtml}
                         <div class="space-y-2 mb-1 max-h-[220px] overflow-y-auto custom-scroll pr-1">
-                            <div class="flex gap-2 items-start"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div><div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition"><p class="break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p></div></div>
-                            <div class="flex gap-2 items-start flex-row-reverse"><div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div><div onclick="toggleBubble(event, this)" class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition"><p class="break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p></div></div>
+                            <div class="flex gap-2 items-start"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div><div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition"><p class="line-clamp-2 break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p></div></div>
+                            <div class="flex gap-2 items-start flex-row-reverse"><div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div><div onclick="toggleBubble(event, this)" class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition"><p class="line-clamp-2 break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p></div></div>
                         </div>
                     </div>`;
 
