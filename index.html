@@ -64,7 +64,7 @@
 
         #mobile-controls {
             position: absolute; 
-            bottom: 420px; 
+            bottom: 380px; 
             left: 50%; transform: translateX(-50%); z-index: 40; 
             display: flex; align-items: center; gap: 12px; padding: 8px 16px;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 999px; 
@@ -94,9 +94,7 @@
         .tab-btn.boy.active { background: #dbeafe; color: #2563eb; border-color: #2563eb; }
         .tab-btn.girl.active { background: #ffe4e6; color: #e11d48; border-color: #e11d48; }
 
-        /* Diary Styles */
         .diary-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; position: relative; }
-        
         .diary-images-container { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
         .diary-img-wrapper { flex: 0 0 100%; scroll-snap-align: start; position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }
         .diary-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
@@ -206,6 +204,7 @@
                 <h3 class="font-bold text-xl text-slate-800 mb-5 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-themePink/10 flex items-center justify-center text-themePink"><i class="fa-solid fa-pen-nib"></i></div><span id="modal-title">Write Memory</span></h3>
                 <form id="data-form" class="space-y-4">
                     <input type="hidden" id="entry-id"><input type="hidden" id="entry-lat"><input type="hidden" id="entry-lng">
+                    <!-- Image Input for Map -->
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photos (Multiple)</label>
                         <input type="file" id="entry-image" accept="image/*" multiple class="hidden" onchange="previewMapImages(this)">
@@ -268,6 +267,7 @@
         let spots = [];
         let diaries = [];
         let currentTab = 'boy';
+        let isSheetExpanded = false;
         let searchTimeout; 
         let tempSearchMarker;
         let currentView = 'map';
@@ -441,16 +441,17 @@
             finally { showLoading(false); }
         }
 
-        // === MAP FUNCTIONS ===
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([25.07, 121.51], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 20 }).addTo(map);
             L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋...', errorMessage: 'Not Found' }).on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
+            
             map.on('click', onMapClick);
+
             map.on('popupopen', function(e) { setTimeout(() => { e.popup.update(); }, 10); });
             fetchData('map');
             const controls = document.getElementById('mobile-controls');
-            if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
+            if (window.innerWidth < 768) controls.style.bottom = '370px'; else controls.style.bottom = '24px';
         }
 
         function toggleSheet() {
@@ -458,10 +459,11 @@
             const controls = document.getElementById('mobile-controls');
             if (window.innerWidth >= 768) return;
             if (sheet.style.height === '70%') { 
-                sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '420px';
+                sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '370px';
             } else { 
                 sheet.style.height = '70%'; controls.classList.add('hidden-fade'); controls.style.pointerEvents = 'none'; 
             }
+            isSheetExpanded = !isSheetExpanded;
         }
 
         function toggleCustomSearch(e) {
@@ -608,12 +610,7 @@
                 card.className = "cute-card p-4 cursor-pointer group hover:border-themeMain transition-all bg-white border border-slate-100 rounded-xl shadow-sm mb-5 md:mb-[-1px] min-h-[165px] flex flex-col justify-between md:h-auto md:min-h-0 md:block";
                 card.onclick = (e) => {
                     if(e.target.closest('button') || e.target.tagName === 'IMG') return;
-                    // if (window.innerWidth < 768 && toggleSheet) toggleSheet(); // Fixed: check if toggleSheet is defined but here it is
-                     if (window.innerWidth < 768) {
-                        const sheet = document.querySelector('.mobile-sheet');
-                        // 簡單邏輯: 只要點擊卡片就展開地圖 (收縮 Sheet)
-                        if(sheet.style.height !== '280px') toggleSheet();
-                    }
+                    if (window.innerWidth < 768 && isSheetExpanded) toggleSheet();
                     flyToSpot(spot.lat, spot.lng, () => { marker.openPopup(); });
                 };
                 card.innerHTML = `
@@ -681,10 +678,23 @@
             else { girlBtn.classList.add('active'); boyBtn.classList.remove('active'); }
         }
 
+        // New Helper Function to Save Comment Author Preference
+        function updateCommentAuthorPreference(val) {
+            localStorage.setItem('diary_comment_author_preference', val);
+            // Update all comment author selects on the page
+            document.querySelectorAll('select[id^="comment-author-"]').forEach(select => {
+                select.value = val;
+            });
+        }
+
         function renderDiaryAll() {
             const container = document.getElementById('diary-list'); container.innerHTML = '';
             if (diaries.length === 0) { container.innerHTML = `<div class="text-center text-slate-400 py-10">還沒有日記喔，快來寫下第一篇吧！</div>`; return; }
             const sortedDiaries = [...diaries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Get saved preference for comment author
+            const savedAuthor = localStorage.getItem('diary_comment_author_preference') || 'boy';
+
             sortedDiaries.forEach(diary => {
                 const isBoy = diary.author === 'boy';
                 const authorColor = isBoy ? 'text-blue-500' : 'text-themePink';
@@ -700,6 +710,11 @@
                     `).join('');
                     imgsHtml = `<div class="${containerClass}">${imgs}</div>`;
                 }
+
+                // Determine selected attribute based on saved preference
+                const boySelected = savedAuthor === 'boy' ? 'selected' : '';
+                const girlSelected = savedAuthor === 'girl' ? 'selected' : '';
+
                 const card = document.createElement('div'); card.className = "diary-card";
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
@@ -726,9 +741,9 @@
                             ${(!diary.comments || diary.comments.length === 0) ? '<p class="text-xs text-slate-300 italic">尚無留言</p>' : ''}
                         </div>
                         <div class="flex gap-2">
-                            <select id="comment-author-${diary.id}" class="text-xs border rounded px-1 py-1 text-slate-500 outline-none">
-                                <option value="boy">Boy</option>
-                                <option value="girl">Girl</option>
+                            <select id="comment-author-${diary.id}" onchange="updateCommentAuthorPreference(this.value)" class="text-xs border rounded px-1 py-1 text-slate-500 outline-none">
+                                <option value="boy" ${boySelected}>Boy</option>
+                                <option value="girl" ${girlSelected}>Girl</option>
                             </select>
                             <input type="text" id="comment-input-${diary.id}" placeholder="寫下回應..." class="flex-1 text-xs border rounded-lg px-2 py-1 outline-none focus:border-themeMain bg-slate-50">
                             <button onclick="submitComment('${diary.id}')" class="text-xs bg-slate-200 hover:bg-themeMain hover:text-white px-3 py-1 rounded-lg transition"><i class="fa-solid fa-paper-plane"></i></button>
@@ -745,6 +760,9 @@
             const text = document.getElementById(`comment-input-${diaryId}`).value;
             
             if (!text.trim()) return;
+
+            // Update preference on submit as well (just in case)
+            updateCommentAuthorPreference(author);
 
             // 呼叫後端 API
             sendData('add_comment', 'diary', {
@@ -788,7 +806,7 @@
             if (map && currentView === 'map') {
                 map.invalidateSize();
                 const controls = document.getElementById('mobile-controls');
-                if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
+                if (window.innerWidth < 768) controls.style.bottom = '370px'; else controls.style.bottom = '24px';
             }
         });
     </script>
