@@ -15,3 +15,12 @@
 #mobile-controls {
     gap: 6px;
 }
+.leaflet-touch .leaflet-control-geocoder {
+    display: none;
+}
+@media screen and (min-width: 1025px) {
+    .diary-container {
+        max-width: 800px;
+        
+    }
+}
