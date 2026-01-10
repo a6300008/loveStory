@@ -624,17 +624,11 @@
 
                 let mediaHtml = "";
 
-                if (isVid && (isCloudVid || isGif)) {
+                if (isVid || isCloudVid) {
                     // 雲端影片或 GIF：使用 <img> 標籤預覽 (最穩定)
                     mediaHtml = `
                         <img src="${displaySrc}" class="w-full h-full object-cover">
                         <div class="video-indicator"><i class="fa-solid fa-play text-[10px]"></i></div>
-                    `;
-                } else if (isVid) {
-                    // 本地上傳但還沒轉成 GIF 的暫時狀態 (通常不會遇到)
-                    mediaHtml = `
-                        <video src="${displaySrc}" class="w-full h-full object-cover" muted autoplay loop playsinline></video>
-                        <div class="video-indicator"><i class="fa-solid fa-video text-[10px]"></i></div>
                     `;
                 } else {
                     // 純圖片
@@ -837,7 +831,7 @@
                 iframe.id = 'lightbox-video';
                 // 確保連結是預覽格式
                 iframe.src = fullPath.includes('preview') ? fullPath : convertToIframeUrl(fullPath);
-                iframe.className = "w-[95vw] h-[60vh] md:w-[800px] md:h-[500px] rounded-2xl border-none shadow-2xl bg-black";
+                iframe.className = "w-[95vw] h-[60vh] md:w-[1200px] md:h-[675px] rounded-2xl border-none shadow-2xl bg-black";
                 iframe.allow = "autoplay; fullscreen";
                 
                 wrapper.appendChild(iframe);
