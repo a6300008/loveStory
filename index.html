@@ -54,6 +54,7 @@
         .leaflet-popup-content p { margin: 0 !important; }
         .leaflet-container a.leaflet-popup-close-button { top: 12px; right: 12px; color: #94a3b8; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 50%; z-index: 20; }
 
+        /* Mobile Sheet */
         .mobile-sheet {
             position: absolute; height: 280px; 
             left: 20px; right: 20px; 
@@ -62,6 +63,7 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 20; display: flex; flex-direction: column; transition: height 0.3s ease;
         }
 
+        /* Mobile Controls */
         #mobile-controls {
             position: absolute; 
             bottom: 380px; 
@@ -76,6 +78,7 @@
         #mobile-controls button:hover { background-color: #f1f5f9; color: #38bdf8; }
         #mobile-controls .divider { width: 1px; height: 28px; background: #e2e8f0; margin: 0; }
         
+        /* Search */
         #custom-search-wrapper { max-width: 0; opacity: 0; overflow: hidden; transition: max-width 0.3s ease-out, opacity 0.2s ease-out; display: flex; align-items: center; }
         #custom-search-wrapper.expanded { max-width: 310px; opacity: 1; }
         #custom-search-input { width: 100%; height: 36px; background: transparent; color: #334155; border: none; outline: none; padding: 0 8px 0 4px; font-size: 15px; }
@@ -85,6 +88,7 @@
         .controls-group { display: flex; align-items: center; gap: 12px; overflow: hidden; max-width: 200px; transition: max-width 0.3s ease; }
         .controls-group.hidden-force { max-width: 0; opacity: 0; pointer-events: none; }
 
+        /* Card Styles */
         .cute-card { 
             background: white; border: 1px solid #e2e8f0; transition: all 0.25s ease-out; position: relative; overflow: hidden; border-radius: 0.75rem;
             min-height: 165px; display: flex; flex-direction: column; justify-content: space-between;
@@ -94,26 +98,114 @@
         .tab-btn.boy.active { background: #dbeafe; color: #2563eb; border-color: #2563eb; }
         .tab-btn.girl.active { background: #ffe4e6; color: #e11d48; border-color: #e11d48; }
 
+        /* Diary Styles */
         .diary-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; position: relative; }
-        .diary-images-container { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
-        .diary-img-wrapper { flex: 0 0 100%; scroll-snap-align: start; position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }
-        .diary-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
-        .diary-img:hover { transform: scale(1.02); }
-        .diary-images-container.multi .diary-img-wrapper { flex: 0 0 85%; } 
+        
+        /* 滾動式多圖 (Popup) */
+        .scrolling-images { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 12px; scroll-snap-type: x mandatory; padding-bottom: 4px; }
+        .scrolling-img-item { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; cursor: pointer; }
+        .scrolling-images.multi .scrolling-img-item { flex: 0 0 85%; }
+        .scrolling-img-item img { width: 100%; height: 100%; object-fit: cover; }
+        /* 影片預覽容器 */
+        .scrolling-img-item video, .grid-img-item {
+            background: #eee;
+        }
 
+        /* 網格縮圖 (Card - 5列) */
         .grid-images-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; }
         .grid-img-item { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; }
+
+        /* 預覽容器 (上傳時) */
         .preview-grid { display: flex; flex-wrap: wrap; gap: 8px; }
         .preview-img-wrapper { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
         .preview-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
         .preview-remove-btn { position: absolute; inset: 0; background: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
         .preview-img-wrapper:hover .preview-remove-btn { opacity: 1; }
 
+        /* 雲端選擇器 1:1 方格 */
+        #drive-selector-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        /* 雲端選擇器項目 */
+        .drive-file-item {
+            width: 100%;
+            aspect-ratio: 1 / 1 !important;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f1f5f9;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .drive-file-item.selected {
+            border-color: #38bdf8;
+            transform: scale(0.95);
+        }
+
+        /* 影片隱藏與顯示的動畫 */
+        .video-hidden {
+            opacity: 0;
+        }
+        .video-visible {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        /* 覆蓋媒體容器樣式，確保 1:1 */
+        .drive-file-item .media-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 影片標籤樣式 */
+        .video-indicator {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+            pointer-events: none;
+        }
+        /* 確保雲端選擇器內的 media-loader 尺寸縮小一點 */
+        .drive-file-item .media-loader {
+            font-size: 10px;
+            background: #f1f5f9;
+        }
+
+        .drive-file-item .media-loader i {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        /* 確保影片在卡片中不顯示控制項 */
+        video::-webkit-media-controls {
+            display:none !important;
+        }
+
+        /* 讓卡片中的圖片/影片也保持比例 */
+        .grid-img-item, .grid-video-item {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 4px;
+        }
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; items-center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; cursor: pointer; transition: all 0.2s; }
         .nav-item i { font-size: 20px; margin-bottom: 2px; }
         .nav-item.active { color: #38bdf8; }
 
+        /* Lightbox */
         #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; }
         #lightbox img { max-width: 100%; max-height: 80vh; object-fit: contain; }
         .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 30px; padding: 20px; cursor: pointer; z-index: 3001; }
@@ -130,6 +222,7 @@
         }
     </style>
     <link rel="stylesheet" href="main.css">
+    
 </head>
 <body class="text-slate-600 font-sans">
 
@@ -140,13 +233,42 @@
         </div>
     </div>
 
-    <!-- Lightbox -->
-    <div id="lightbox" class="hidden flex flex-col items-center justify-center">
-        <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-3xl z-50 p-2"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Lightbox 結構 -->
+    <div id="lightbox" class="hidden fixed inset-0 bg-black/95 z-[3000] flex flex-col items-center justify-center">
+        <!-- 關閉按鈕 -->
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-3xl z-[3001] p-2 hover:text-themeMain transition">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <!-- 左右導航 -->
         <div class="lightbox-nav lightbox-prev" onclick="changeSlide(-1)"><i class="fa-solid fa-chevron-left"></i></div>
-        <img id="lightbox-img" src="" alt="Full view">
         <div class="lightbox-nav lightbox-next" onclick="changeSlide(1)"><i class="fa-solid fa-chevron-right"></i></div>
-        <div class="absolute bottom-6 text-white text-sm tracking-widest" id="lightbox-counter">1 / 1</div>
+        
+        <!-- 媒體顯示區 (關鍵：保持 ID 穩定) -->
+        <div id="lightbox-content-wrapper" class="relative flex items-center justify-center w-full h-full p-4">
+            <!-- 圖片標籤永遠存在 -->
+            <img id="lightbox-img" src="" alt="Full view" class="max-w-full max-h-[80vh] object-contain hidden">
+            <!-- 影片標籤將會動態插入到這裡，ID 設為 lightbox-video -->
+        </div>
+        
+        <!-- 計數器 -->
+        <div class="absolute bottom-6 text-white text-sm tracking-widest font-bold bg-black/50 px-4 py-1 rounded-full" id="lightbox-counter">1 / 1</div>
+    </div>
+
+    <!-- Drive File Selector Modal -->
+    <div id="drive-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[3000] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md h-[500px] flex flex-col overflow-hidden relative animate-[fadeIn_0.2s_ease-out]">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="font-bold text-lg text-slate-700">Select from Drive</h3>
+                <button onclick="closeDriveModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="drive-selector-list" class="p-4 flex-1 overflow-y-auto no-scrollbar">
+                <!-- Drive files will be injected here -->
+            </div>
+            <div class="p-4 border-t flex justify-end">
+                <button onclick="confirmDriveSelection()" class="px-6 py-2 bg-themeMain text-white rounded-xl font-bold hover:bg-sky-500 transition">Confirm</button>
+            </div>
+        </div>
     </div>
 
     <!-- ===== View 1: Map ===== -->
@@ -207,10 +329,16 @@
                     <!-- Image Input for Map -->
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photos (Multiple)</label>
-                        <input type="file" id="entry-image" accept="image/*" multiple class="hidden" onchange="previewMapImages(this)">
-                        <div id="map-preview-container" class="preview-grid w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[80px] cursor-pointer hover:border-themeMain transition items-center justify-center" onclick="document.getElementById('entry-image').click()">
-                            <div class="flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-camera text-2xl mb-2"></i><span class="text-xs font-bold">上傳照片 (多張)</span></div>
+                        <div class="flex gap-2">
+                            <input type="file" id="entry-image" accept="image/*" multiple class="hidden" onchange="previewMapImages(this)">
+                            <div class="flex-1 border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-themeMain transition text-slate-400" onclick="document.getElementById('entry-image').click()">
+                                <i class="fa-solid fa-upload text-xl"></i><span class="text-[10px] font-bold">上傳</span>
+                            </div>
+                            <div class="flex-1 border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-themeMain transition text-slate-400" onclick="openDriveSelector('map')">
+                                <i class="fa-brands fa-google-drive text-xl"></i><span class="text-[10px] font-bold">Drive</span>
+                            </div>
                         </div>
+                        <div id="map-preview-container" class="preview-grid mt-2"></div>
                     </div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Location</label><input type="text" id="entry-name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-bold focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label><input type="date" id="entry-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
@@ -243,10 +371,16 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2 ml-1 uppercase">Photos (Multiple)</label>
-                        <input type="file" id="diary-image-input" accept="image/*" multiple class="hidden" onchange="previewMultiImages(this)">
-                        <div id="diary-preview-container" class="preview-grid w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-wrap gap-2 min-h-[80px] cursor-pointer hover:border-themeMain transition items-center justify-center" onclick="document.getElementById('diary-image-input').click()">
-                            <div class="w-full flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-images text-2xl mb-2"></i><span class="text-xs font-bold">點擊上傳多張照片</span></div>
+                        <div class="flex gap-2">
+                            <input type="file" id="diary-image-input" accept="image/*" multiple class="hidden" onchange="previewMultiImages(this)">
+                            <div class="flex-1 border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-themeMain transition text-slate-400" onclick="document.getElementById('diary-image-input').click()">
+                                <i class="fa-solid fa-upload text-xl"></i><span class="text-[10px] font-bold">上傳</span>
+                            </div>
+                            <div class="flex-1 border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-themeMain transition text-slate-400" onclick="openDriveSelector('diary')">
+                                <i class="fa-brands fa-google-drive text-xl"></i><span class="text-[10px] font-bold">Drive</span>
+                            </div>
                         </div>
+                        <div id="diary-preview-container" class="preview-grid mt-2"></div>
                     </div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Date</label><input type="date" id="diary-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-themeMain focus:border-transparent outline-none transition"></div>
                     <div><label class="block text-xs font-bold text-slate-400 mb-1 ml-1 uppercase">Content</label><textarea id="diary-content" rows="5" required placeholder="紀錄今天的小日子..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-themeMain focus:border-transparent resize-none"></textarea></div>
@@ -258,7 +392,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/gifshot-plus@1.0.2/dist/gifshot.min.js"></script>
     <script>
         // const API_URL = "YOUR_GAS_URL"; // Defined in api.js
 
@@ -277,6 +411,7 @@
         let currentDiaryImages = []; 
         let lightboxImages = [];
         let lightboxIndex = 0;
+        let driveTarget = '';
 
         function switchView(view) {
             currentView = view;
@@ -292,40 +427,230 @@
                 fetchData('diary');
             }
         }
+        /**
+         * 透過結構化的 type 欄位判斷是否為影片
+         */
+        function isVideo(item) {
+            if (!item) return false;
+            // 優先檢查新結構的 type 屬性
+            if (item.type) return item.type === 'video';
+            
+            // 備案：相容舊資料 (字串判斷)
+            const src = (typeof item === 'object') ? item.full : item;
+            return src && (src.includes('video') || src.includes('preview') || src.match(/\.(mp4|webm|mov)/i));
+        }
+        /**
+         * 將 Google Drive 連結轉換為更穩定、支援串流的格式
+         */
+        function getStreamableUrl(url) {
+            if (!url) return "";
+            // 如果是 Base64 直接回傳
+            if (url.startsWith('data:')) return url;
+            
+            // 提取 Google Drive ID
+            const match = url.match(/[-\w]{25,}/);
+            if (match && (url.includes('google.com') || url.includes('googleusercontent.com'))) {
+                const fileId = match[0];
+                // 使用 Google Drive 的直接下載/串流網址
+                return `https://drive.google.com/uc?id=${fileId}&export=preview`;
+            }
+            return url;
+        }
 
-        // Map Image Preview (Multi)
-        function previewMapImages(input) {
-            if (input.files) {
-                Array.from(input.files).forEach(file => {
-                    processImage(file, (base64) => {
-                        currentMapImages.push(base64);
-                        renderMapPreview();
+        // 影片壓縮與剪輯核心：產生 2 秒低畫質預覽
+        async function createVideoPreview(file) {
+            return new Promise((resolve) => {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.muted = true;
+                video.playsInline = true;
+
+                video.onloadedmetadata = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 設定極低解析度 (320px 寬) 達到壓縮目的
+                    const scale = 320 / video.videoWidth;
+                    canvas.width = 320;
+                    canvas.height = video.videoHeight * scale;
+
+                    const stream = canvas.captureStream(15); // 15 FPS
+                    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 100000 }); // 極低碼率
+                    const chunks = [];
+
+                    recorder.ondataavailable = (e) => chunks.push(e.data);
+                    recorder.onstop = async () => {
+                        const blob = new Blob(chunks, { type: 'video/webm' });
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                        URL.revokeObjectURL(video.src);
+                    };
+
+                    video.play();
+                    recorder.start();
+
+                    // 繪製循環：每影格畫入 canvas
+                    const draw = () => {
+                        if (video.paused || video.ended) return;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        requestAnimationFrame(draw);
+                    };
+                    draw();
+
+                    // 2 秒後停止錄製
+                    setTimeout(() => {
+                        recorder.stop();
+                        video.pause();
+                    }, 2000);
+                };
+            });
+        }
+        // 修改原有的 processFile
+        async function processFile(file, callback) {
+            if (file.type.startsWith('video/')) {
+                showLoading(true);
+                
+                // 1. 壓縮原片 (用於 Lightbox 展開看高清)
+                const fullRes = await compressVideo(file, { width: 854 }); 
+
+                // 2. 產生 2 秒 GIF 縮圖
+                const thumbRes = await new Promise((resolve) => {
+                    gifshot.createGIF({
+                        video: [URL.createObjectURL(file)],
+                        numFrames: 20,      // 2 秒內抓 20 張圖 (10 FPS)
+                        gifWidth: 320,      // 縮圖寬度
+                        gifHeight: 320,     // 縮圖高度
+                        interval: 0.1,      // 每 0.1 秒抓一幀
+                        sampleInterval: 10, // 畫質抽樣
+                    }, function (obj) {
+                        if (!obj.error) {
+                            resolve(obj.image); // 回傳 GIF Base64
+                        } else {
+                            console.error("GIF 產生失敗", obj.error);
+                            resolve(null);
+                        }
                     });
                 });
+
+                showLoading(false);
+                callback({ full: fullRes, thumb: thumbRes });
+            } else {
+                processImage(file, callback); 
+            }
+        }
+        // 影片壓縮核心：產出指定解析度與長度的影片
+        async function compressVideo(file, options = { width: 640, duration: null }) {
+            return new Promise((resolve) => {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.muted = true;
+                video.playsInline = true;
+
+                video.onloadedmetadata = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 計算比例
+                    const scale = options.width / video.videoWidth;
+                    canvas.width = options.width;
+                    canvas.height = video.videoHeight * scale;
+
+                    const stream = canvas.captureStream(24); // 24 FPS
+                    const recorder = new MediaRecorder(stream, { 
+                        mimeType: 'video/webm;codecs=vp8', 
+                        videoBitsPerSecond: options.duration ? 100000 : 800000 // 預覽用極低碼率，原片用中等碼率
+                    });
+
+                    const chunks = [];
+                    recorder.ondataavailable = (e) => chunks.push(e.data);
+                    recorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: 'video/webm' });
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                        URL.revokeObjectURL(video.src);
+                    };
+
+                    video.play();
+                    recorder.start();
+
+                    const draw = () => {
+                        if (video.paused || video.ended) return;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        requestAnimationFrame(draw);
+                    };
+                    draw();
+
+                    // 如果有設定長度（預覽），則定時停止；否則播放到底（原片）
+                    if (options.duration) {
+                        setTimeout(() => { recorder.stop(); video.pause(); }, options.duration);
+                    } else {
+                        video.onended = () => recorder.stop();
+                    }
+                };
+            });
+        }
+
+        // 修改地圖上傳預覽
+        async function previewMapImages(input) {
+            if (input.files) {
+                // 使用 for...of 處理 async，確保順序並顯示 Loading
+                showLoading(true);
+                for (const file of input.files) {
+                    await new Promise((resolve) => {
+                        processFile(file, (data) => {
+                            currentMapImages.push(data);
+                            resolve();
+                        });
+                    });
+                }
+                renderMapPreview();
+                showLoading(false);
             }
         }
 
         function renderMapPreview() {
-             const previewDiv = document.getElementById('map-preview-container');
-             previewDiv.innerHTML = '';
-             if(currentMapImages.length === 0) {
-                 previewDiv.innerHTML = `<div class="flex flex-col items-center justify-center text-slate-400 w-full"><i class="fa-solid fa-camera text-2xl mb-2"></i><span class="text-xs font-bold">上傳照片 (多張)</span></div>`;
-                 return;
-             }
-             currentMapImages.forEach((base64, index) => {
+            const previewDiv = document.getElementById('map-preview-container');
+            previewDiv.innerHTML = '';
+            
+            currentMapImages.forEach((item, index) => {
+                const isVid = isVideo(item);
+                const displaySrc = getSource(item, 'thumb'); 
+                
+                // 判斷是否為雲端來源影片，或者是剛剛產出的 GIF
+                const isCloudVid = (typeof item === 'object' && item.isCloud);
+                const isGif = (typeof displaySrc === 'string' && displaySrc.startsWith('data:image/gif')) || (displaySrc && displaySrc.includes('.gif'));
+
+                let mediaHtml = "";
+
+                if (isVid && (isCloudVid || isGif)) {
+                    // 雲端影片或 GIF：使用 <img> 標籤預覽 (最穩定)
+                    mediaHtml = `
+                        <img src="${displaySrc}" class="w-full h-full object-cover">
+                        <div class="video-indicator"><i class="fa-solid fa-play text-[10px]"></i></div>
+                    `;
+                } else if (isVid) {
+                    // 本地上傳但還沒轉成 GIF 的暫時狀態 (通常不會遇到)
+                    mediaHtml = `
+                        <video src="${displaySrc}" class="w-full h-full object-cover" muted autoplay loop playsinline></video>
+                        <div class="video-indicator"><i class="fa-solid fa-video text-[10px]"></i></div>
+                    `;
+                } else {
+                    // 純圖片
+                    mediaHtml = `<img src="${displaySrc}" class="w-full h-full object-cover">`;
+                }
+
                 const imgDiv = document.createElement('div');
                 imgDiv.className = "preview-img-wrapper relative group";
                 imgDiv.innerHTML = `
-                    <img src="${base64}">
-                    <div class="preview-remove-btn" onclick="removeMapImage(${index})"><i class="fa-solid fa-trash"></i></div>
+                    ${mediaHtml}
+                    <div class="preview-remove-btn" onclick="removeMapImage(${index})">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </div>
                 `;
                 previewDiv.appendChild(imgDiv);
-             });
-             const addBtn = document.createElement('div');
-             addBtn.className = "preview-img-wrapper flex items-center justify-center bg-slate-50 cursor-pointer text-slate-400 hover:text-themeMain hover:border-themeMain";
-             addBtn.innerHTML = '<i class="fa-solid fa-plus"></i>';
-             addBtn.onclick = (e) => { e.stopPropagation(); document.getElementById('entry-image').click(); };
-             previewDiv.appendChild(addBtn);
+            });
         }
 
         function removeMapImage(index) {
@@ -334,43 +659,116 @@
         }
 
         // Diary Image Preview (Multi)
-        function previewMultiImages(input) {
+        async function previewMultiImages(input) {
             if (input.files) {
-                Array.from(input.files).forEach(file => {
-                    processImage(file, (base64) => {
-                        currentDiaryImages.push(base64);
-                        renderDiaryPreview();
+                showLoading(true);
+                for (const file of input.files) {
+                    await new Promise((resolve) => {
+                        processFile(file, (data) => {
+                            currentDiaryImages.push(data);
+                            resolve();
+                        });
                     });
-                });
+                }
+                renderDiaryPreview();
+                showLoading(false);
             }
         }
 
         function renderDiaryPreview() {
             const container = document.getElementById('diary-preview-container');
             container.innerHTML = '';
-            if(currentDiaryImages.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center text-slate-400 w-full"><i class="fa-solid fa-images text-2xl mb-2"></i><span class="text-xs font-bold">點擊上傳多張</span></div>`;
-                return;
-            }
-            currentDiaryImages.forEach((base64, index) => {
+            
+            currentDiaryImages.forEach((item, index) => {
+                const isVid = isVideo(item);
+                const displaySrc = getSource(item, 'thumb'); // 關鍵修正
+                
+                const mediaHtml = isVid 
+                    ? `<video src="${displaySrc}" class="w-full h-full object-cover" muted autoplay loop playsinline></video>`
+                    : `<img src="${displaySrc}" class="w-full h-full object-cover">`;
+
                 const imgDiv = document.createElement('div');
                 imgDiv.className = "preview-img-wrapper relative group";
                 imgDiv.innerHTML = `
-                    <img src="${base64}">
-                    <div class="preview-remove-btn" onclick="removeDiaryImage(${index})"><i class="fa-solid fa-trash"></i></div>
+                    ${mediaHtml}
+                    <div class="preview-remove-btn" onclick="removeDiaryImage(${index})">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </div>
                 `;
                 container.appendChild(imgDiv);
             });
-            const addBtn = document.createElement('div');
-             addBtn.className = "preview-img-wrapper flex items-center justify-center bg-slate-50 cursor-pointer text-slate-400 hover:text-themeMain hover:border-themeMain";
-             addBtn.innerHTML = '<i class="fa-solid fa-plus"></i>';
-             addBtn.onclick = (e) => { e.stopPropagation(); document.getElementById('diary-image-input').click(); };
-             container.appendChild(addBtn);
         }
 
         function removeDiaryImage(index) {
             currentDiaryImages.splice(index, 1);
             renderDiaryPreview();
+        }
+
+        // 修正雲端選擇器載入與選擇邏輯
+        async function openDriveSelector(target) {
+            driveTarget = target;
+            const modal = document.getElementById('drive-modal');
+            const list = document.getElementById('drive-selector-list');
+            
+            modal.classList.remove('hidden');
+            list.innerHTML = `<div class="col-span-12 w-full flex flex-col items-center justify-center py-20 text-slate-400">
+                <i class="fa-solid fa-sync fa-spin text-2xl mb-2"></i><p>讀取雲端相簿...</p>
+            </div>`;
+
+            try {
+                const response = await fetch(`${API_URL}?action=list_drive_files`);
+                const files = await response.json();
+                list.innerHTML = '';
+                
+                files.forEach((file) => {
+                    const div = document.createElement('div');
+                    div.className = 'drive-file-item';
+                    div.dataset.raw = JSON.stringify(file); // 暫存整筆資料
+                    div.innerHTML = `
+                        <img src="${file.gifUrl || file.url}" class="w-full h-full object-cover">
+                        ${file.mime.includes('video') ? '<div class="video-indicator"><i class="fa-solid fa-play"></i></div>' : ''}
+                    `;
+                    div.onclick = function() { this.classList.toggle('selected'); };
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                list.innerHTML = '<div class="col-span-3 text-center py-20 text-red-400">載入失敗</div>';
+            }
+        }
+
+        function closeDriveModal() { document.getElementById('drive-modal').classList.add('hidden'); }
+
+        // 修正確認選擇邏輯
+        function confirmDriveSelection() {
+            const selected = document.querySelectorAll('.drive-file-item.selected');
+            selected.forEach(el => {
+                const fileData = JSON.parse(el.dataset.raw);
+                const isVid = fileData.mime.includes('video');
+
+                let itemToPush;
+                if (isVid) {
+                    itemToPush = { 
+                        full: fileData.iframeUrl, 
+                        thumb: fileData.gifUrl,
+                        type: "video"
+                    };
+                } else {
+                    // 圖片也存成標準物件，方便 GAS 辨識
+                    itemToPush = {
+                        full: fileData.url,
+                        type: "image"
+                    };
+                }
+                
+                // 檢查重複並推入 (略)
+                const targetArray = (driveTarget === 'map') ? currentMapImages : currentDiaryImages;
+                const exists = targetArray.some(img => (typeof img === 'object' ? img.full : img) === itemToPush.full);
+                if (!exists) targetArray.push(itemToPush);
+            });
+            
+            if (driveTarget === 'map') renderMapPreview();
+            else renderDiaryPreview();
+            closeDriveModal();
         }
 
         function processImage(file, callback) {
@@ -397,9 +795,20 @@
             document.getElementById('lightbox').classList.remove('hidden');
             document.getElementById('lightbox').classList.add('flex');
         }
-        function closeLightbox() { 
-            document.getElementById('lightbox').classList.add('hidden'); 
-            document.getElementById('lightbox').classList.remove('flex');
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            
+            // 關鍵：停止並移除影片，防止關閉後聲音繼續播放
+            const video = document.getElementById('lightbox-video');
+            if (video) {
+                if (video.tagName === 'VIDEO') {
+                    video.pause();
+                    video.src = "";
+                }
+                video.remove();
+            }
         }
         function changeSlide(step) {
             lightboxIndex += step;
@@ -407,11 +816,64 @@
             if (lightboxIndex >= lightboxImages.length) lightboxIndex = 0;
             updateLightbox();
         }
+        // 修改 Lightbox (這裡要用 full 原片)
         function updateLightbox() {
-            document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
-            document.getElementById('lightbox-counter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
-        }
+            const img = document.getElementById('lightbox-img');
+            const wrapper = document.getElementById('lightbox-content-wrapper');
+            const counter = document.getElementById('lightbox-counter');
+            
+            // 移除舊的影片/Iframe
+            const oldMedia = document.getElementById('lightbox-video');
+            if (oldMedia) oldMedia.remove();
 
+            const item = lightboxImages[lightboxIndex];
+            const fullPath = getSource(item, 'full');
+
+            // 直接使用 item.type 判斷
+            if (isVideo(item)) {
+                img.classList.add('hidden');
+
+                const iframe = document.createElement('iframe');
+                iframe.id = 'lightbox-video';
+                // 確保連結是預覽格式
+                iframe.src = fullPath.includes('preview') ? fullPath : convertToIframeUrl(fullPath);
+                iframe.className = "w-[95vw] h-[60vh] md:w-[800px] md:h-[500px] rounded-2xl border-none shadow-2xl bg-black";
+                iframe.allow = "autoplay; fullscreen";
+                
+                wrapper.appendChild(iframe);
+            } else {
+                img.src = fullPath;
+                img.classList.remove('hidden');
+            }
+
+            if (counter) counter.innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
+        }
+        function convertToIframeUrl(url) {
+            if (url.includes('preview')) return url;
+            const match = url.match(/[-\w]{25,}/);
+            if (match) {
+                return `https://drive.google.com/file/d/${match[0]}/preview`;
+            }
+            return url;
+        }
+        /**
+         * 備案：如果原生播放器失敗，改用 Google Drive 的 Iframe 預覽器
+         */
+         function switchToIframe(videoElement, originalUrl) {
+            const match = originalUrl.match(/[-\w]{25,}/);
+            if (match) {
+                const fileId = match[0];
+                const iframe = document.createElement('iframe');
+                iframe.id = 'lightbox-video'; // 使用相同 ID 方便下一張切換時清理
+                iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+                iframe.className = "w-[90vw] h-[60vh] md:w-[800px] md:h-[500px] rounded-xl border-none";
+                iframe.allow = "autoplay";
+                
+                const parent = videoElement.parentNode;
+                videoElement.remove();
+                parent.appendChild(iframe);
+            }
+        }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
 
@@ -445,13 +907,11 @@
             map = L.map('map', { zoomControl: false }).setView([25.07, 121.51], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 20 }).addTo(map);
             L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋...', errorMessage: 'Not Found' }).on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
-            
             map.on('click', onMapClick);
-
             map.on('popupopen', function(e) { setTimeout(() => { e.popup.update(); }, 10); });
             fetchData('map');
             const controls = document.getElementById('mobile-controls');
-            if (window.innerWidth < 768) controls.style.bottom = '370px'; else controls.style.bottom = '24px';
+            if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
         }
 
         function toggleSheet() {
@@ -459,7 +919,7 @@
             const controls = document.getElementById('mobile-controls');
             if (window.innerWidth >= 768) return;
             if (sheet.style.height === '70%') { 
-                sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '370px';
+                sheet.style.height = '280px'; controls.classList.remove('hidden-fade'); controls.style.pointerEvents = 'auto'; controls.style.bottom = '420px';
             } else { 
                 sheet.style.height = '70%'; controls.classList.add('hidden-fade'); controls.style.pointerEvents = 'none'; 
             }
@@ -526,8 +986,7 @@
         window.toggleBubble = function(e, div) {
             if(e) { e.stopPropagation(); e.preventDefault(); }
             const p = div.querySelector('p'); p.classList.toggle('line-clamp-2');
-            console.log(p)
-            // setTimeout(() => { map.eachLayer(l => { if(l instanceof L.Popup && l.isOpen()) l.update(); }); }, 10);
+            setTimeout(() => { map.eachLayer(l => { if(l instanceof L.Popup && l.isOpen()) l.update(); }); }, 10);
         };
 
         function flyToSpot(lat, lng, callback) {
@@ -553,6 +1012,67 @@
         }
 
         function getHeartIcon() { return L.divIcon({ className: 'heart-icon-div', html: '<i class="fa-solid fa-heart heart-marker"></i>', iconSize: [38, 38], iconAnchor: [19, 36], popupAnchor: [0, -40] }); }
+        /**
+         * 安全取得圖片來源
+         */
+        function getSource(item, sourceType = 'thumb') {
+            if (!item) return "";
+            if (typeof item === 'object') {
+                // 如果是影片，thumb 存在就用 thumb，否則用 full
+                if (item.type === 'video') {
+                    return sourceType === 'full' ? item.full : (item.thumb || item.full);
+                }
+                return item.full; // 圖片
+            }
+            return item; // 舊字串資料
+        }
+        // 修改生成媒體標籤的函式
+        function getMediaTag(item, className = "", onClickHtml = "") {
+            const isVid = isVideo(item);
+            const thumbSrc = getSource(item, 'thumb'); 
+            
+            if (isVid) {
+                return `
+                    <div class="media-container ${className}">
+                        <!-- 直接使用 GIF <img> 標籤 -->
+                        <img 
+                            src="${thumbSrc}" 
+                            class="w-full h-full object-cover" 
+                            ${onClickHtml} 
+                            onerror="this.src='https://placehold.co/100?text=Video'"
+                            loading="lazy">
+                        <div class="video-indicator"><i class="fa-solid fa-play text-[9px]"></i></div>
+                    </div>`;
+            } else {
+                return `<img src="${thumbSrc}" class="${className}" ${onClickHtml} loading="lazy">`;
+            }
+        }
+        // 當影片真正開始播放時觸發
+        function handleMediaReady(id) {
+            const video = document.getElementById(id);
+            const loader = document.getElementById('loader_' + id);
+            if (video && loader) {
+                video.classList.remove('video-hidden');
+                video.classList.add('video-visible');
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 300);
+            }
+        }
+        // 處理影片載入失敗 (Google Drive 處理中)
+        function handleMediaError(id, src) {
+            const loader = document.getElementById('loader_' + id);
+            if (loader) {
+                loader.innerHTML = '<i class="fa-solid fa-clock text-[10px]"></i>';
+            }
+            // 每 10 秒重試一次
+            setTimeout(() => {
+                const video = document.getElementById(id);
+                if (video) {
+                    video.src = src + (src.includes('?') ? '&' : '?') + "t=" + new Date().getTime();
+                    video.load();
+                }
+            }, 10000);
+        }
 
         function renderMapAll() {
             markers.forEach(m => map.removeLayer(m));
@@ -562,31 +1082,37 @@
             document.getElementById('map-count-display').innerText = spots.length;
             if (spots.length === 0) listContainer.innerHTML = `<div class="p-10 text-center text-slate-300 col-span-1">尚無回憶，點擊地圖新增！</div>`;
             
-            let sortedSpots = [...spots].sort((a, b) => b.id - a.id);
+            let sortedSpots = [...spots].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedSpots.forEach(spot => {
-                let images = spot.image || [];
+                let images = spot.image || []; // 注意地圖資料欄位是 .image
                 if (!Array.isArray(images) && images) images = [images];
 
-                let imgsHtml = '';
-                if(images.length > 0) {
-                    const containerClass = 'scrolling-images' + (images.length > 1 ? ' multi' : '');
-                    const imgItems = images.map((src, idx) => 
-                        `<div class="scrolling-img-item" onclick="openLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${idx})"><img src="${src}"></div>`
-                    ).join('');
-                    imgsHtml = `<div class="${containerClass}">${imgItems}</div>`;
-                }
-
+                // --- 修正點：側邊欄 5 列小縮圖 ---
                 let cardImgsHtml = '';
-                if(images.length > 0) {
-                     const imgItems = images.map((src, idx) => 
-                        `<img src="${src}" class="grid-img-item" onclick="openLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${idx})">`
-                    ).join('');
-                    cardImgsHtml = `<div class="grid-images-5">${imgItems}</div>`;
+                if (images.length > 0) {
+                    cardImgsHtml = `<div class="grid-images-5">` + 
+                        images.map((item, idx) => {
+                            // 這裡調用 getMediaTag，它會自動判斷影片並加上 loader
+                            // class 設定為 grid-img-item
+                            return getMediaTag(item, "grid-img-item", `onclick="event.stopPropagation(); openLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${idx})"`);
+                        }).join('') + 
+                    `</div>`;
+                }
+                
+                // --- 地圖 Marker 彈窗 (Popup) ---
+                let imgsHtml = '';
+                if (images.length > 0) {
+                    const containerClass = 'scrolling-images' + (images.length > 1 ? ' multi' : '');
+                    imgsHtml = `<div class="${containerClass}">` + 
+                        images.map((item, idx) => {
+                            return getMediaTag(item, "scrolling-img-item", `onclick="openLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${idx})"`);
+                        }).join('') + 
+                    `</div>`;
                 }
 
                 const popupContent = `
-                    <div class="font-sans w-[320px] p-3 bg-white relative">
+                    <div class="font-sans w-[280px] p-3 bg-white relative">
                         <div class="mb-2 border-b border-slate-100 pb-2 pr-24">
                             <h3 class="font-bold text-slate-800 text-lg leading-tight break-words">${spot.name}</h3>
                             <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5"><i class="fa-regular fa-calendar"></i><span>${spot.date}</span></div>
@@ -597,8 +1123,8 @@
                         </div>
                         ${imgsHtml}
                         <div class="space-y-2 mb-1 max-h-[220px] overflow-y-auto custom-scroll pr-1">
-                            <div class="flex gap-2 items-start"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div><div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition"><p class="line-clamp-2 break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p></div></div>
-                            <div class="flex gap-2 items-start flex-row-reverse"><div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div><div onclick="toggleBubble(event, this)" class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition"><p class="line-clamp-2 break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p></div></div>
+                            <div class="flex gap-2 items-start"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-none text-[10px]"><i class="fa-solid fa-mars"></i></div><div onclick="toggleBubble(event, this)" class="bg-blue-50 rounded-xl rounded-tl-none px-3 py-2 text-sm text-slate-600 flex-1 border border-blue-100/50 shadow-sm cursor-pointer hover:bg-blue-100/50 transition"><p class="break-words !m-0 whitespace-pre-line">${spot.note_boy || '...'}</p></div></div>
+                            <div class="flex gap-2 items-start flex-row-reverse"><div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-themePink flex-none text-[10px]"><i class="fa-solid fa-venus"></i></div><div onclick="toggleBubble(event, this)" class="bg-pink-50 rounded-xl rounded-tr-none px-3 py-2 text-sm text-slate-600 flex-1 border border-pink-100/50 shadow-sm text-right cursor-pointer hover:bg-pink-100/50 transition"><p class="break-words !m-0 text-left whitespace-pre-line">${spot.note_girl || '...'}</p></div></div>
                         </div>
                     </div>`;
 
@@ -636,7 +1162,7 @@
             modal.classList.remove('hidden'); switchTab('boy', 'panel-boy', 'panel-girl', document.querySelector('#data-modal .tab-btn.boy'));
             
             currentMapImages = []; 
-            document.getElementById('map-preview-container').innerHTML = `<div class="flex flex-col items-center justify-center text-slate-400"><i class="fa-solid fa-camera text-2xl mb-2"></i><span class="text-xs font-bold">上傳照片 (多張)</span></div>`;
+            document.getElementById('map-preview-container').innerHTML = ``;
             
             if (mode === 'add') {
                 document.getElementById('modal-title').innerText = "New Memory"; document.getElementById('data-form').reset();
@@ -660,13 +1186,19 @@
         }
         window.editSpot = function(id) { const spot = spots.find(s => s.id == id); if (spot) openModal('edit', spot); };
         window.deleteSpot = function(id) { if(confirm('確定要刪除這筆回憶嗎？')) sendData('delete', 'map', { id: id }); };
+        // 修正 Map 表單提交 (統一欄位名稱為 images)
         document.getElementById('data-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            sendData(document.getElementById('entry-id').value ? 'update' : 'create', 'map', {
-                id: document.getElementById('entry-id').value || Date.now().toString(),
-                name: document.getElementById('entry-name').value, date: document.getElementById('entry-date').value,
-                lat: document.getElementById('entry-lat').value, lng: document.getElementById('entry-lng').value,
-                note_boy: document.getElementById('entry-note-boy').value, note_girl: document.getElementById('entry-note-girl').value, image: currentMapImages
+            const id = document.getElementById('entry-id').value;
+            sendData(id ? 'update' : 'create', 'map', {
+                id: id || Date.now().toString(),
+                name: document.getElementById('entry-name').value,
+                date: document.getElementById('entry-date').value,
+                lat: document.getElementById('entry-lat').value,
+                lng: document.getElementById('entry-lng').value,
+                note_boy: document.getElementById('entry-note-boy').value,
+                note_girl: document.getElementById('entry-note-girl').value,
+                images: currentMapImages // 這裡改成 images (複數) 與 GAS 統一
             }, 'data-modal');
         });
 
@@ -679,23 +1211,10 @@
             else { girlBtn.classList.add('active'); boyBtn.classList.remove('active'); }
         }
 
-        // New Helper Function to Save Comment Author Preference
-        function updateCommentAuthorPreference(val) {
-            localStorage.setItem('diary_comment_author_preference', val);
-            // Update all comment author selects on the page
-            document.querySelectorAll('select[id^="comment-author-"]').forEach(select => {
-                select.value = val;
-            });
-        }
-
         function renderDiaryAll() {
             const container = document.getElementById('diary-list'); container.innerHTML = '';
             if (diaries.length === 0) { container.innerHTML = `<div class="text-center text-slate-400 py-10">還沒有日記喔，快來寫下第一篇吧！</div>`; return; }
             const sortedDiaries = [...diaries].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // Get saved preference for comment author
-            const savedAuthor = localStorage.getItem('diary_comment_author_preference') || 'boy';
-
             sortedDiaries.forEach(diary => {
                 const isBoy = diary.author === 'boy';
                 const authorColor = isBoy ? 'text-blue-500' : 'text-themePink';
@@ -711,11 +1230,6 @@
                     `).join('');
                     imgsHtml = `<div class="${containerClass}">${imgs}</div>`;
                 }
-
-                // Determine selected attribute based on saved preference
-                const boySelected = savedAuthor === 'boy' ? 'selected' : '';
-                const girlSelected = savedAuthor === 'girl' ? 'selected' : '';
-
                 const card = document.createElement('div'); card.className = "diary-card";
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
@@ -727,55 +1241,14 @@
                     </div>
                     ${imgsHtml}
                     <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">${diary.content}</div>
-                    
-                    <!-- 留言區塊 -->
-                    <div class="mt-4 pt-3 border-t border-slate-50">
-                        <div class="text-xs text-slate-400 font-bold mb-2">留言</div>
-                        <div class="space-y-2 mb-3 max-h-[150px] overflow-y-auto custom-scroll">
-                            ${(diary.comments || []).map(c => `
-                                <div class="flex gap-2 text-xs">
-                                    <span class="font-bold ${c.author === 'boy' ? 'text-blue-400' : 'text-pink-400'}">${c.author === 'boy' ? 'Boy' : 'Girl'}:</span>
-                                    <span class="text-slate-600 flex-1">${c.text}</span>
-                                    <span class="text-slate-300 text-[10px]">${c.time}</span>
-                                </div>
-                            `).join('')}
-                            ${(!diary.comments || diary.comments.length === 0) ? '<p class="text-xs text-slate-300 italic">尚無留言</p>' : ''}
-                        </div>
-                        <div class="flex gap-2">
-                            <select id="comment-author-${diary.id}" onchange="updateCommentAuthorPreference(this.value)" class="text-xs border rounded px-1 py-1 text-slate-500 outline-none">
-                                <option value="boy" ${boySelected}>Boy</option>
-                                <option value="girl" ${girlSelected}>Girl</option>
-                            </select>
-                            <input type="text" id="comment-input-${diary.id}" placeholder="寫下回應..." class="flex-1 text-xs border rounded-lg px-2 py-1 outline-none focus:border-themeMain bg-slate-50">
-                            <button onclick="submitComment('${diary.id}')" class="text-xs bg-slate-200 hover:bg-themeMain hover:text-white px-3 py-1 rounded-lg transition"><i class="fa-solid fa-paper-plane"></i></button>
-                        </div>
-                    </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // 新增留言函式
-        function submitComment(diaryId) {
-            const author = document.getElementById(`comment-author-${diaryId}`).value;
-            const text = document.getElementById(`comment-input-${diaryId}`).value;
-            
-            if (!text.trim()) return;
-
-            // Update preference on submit as well (just in case)
-            updateCommentAuthorPreference(author);
-
-            // 呼叫後端 API
-            sendData('add_comment', 'diary', {
-                id: diaryId,
-                commentAuthor: author,
-                commentText: text
-            });
-        }
-
         function openDiaryModal(mode, id) {
             const modal = document.getElementById('diary-modal'); modal.classList.remove('hidden');
-            document.getElementById('diary-preview-container').innerHTML = `<i class="fa-solid fa-camera text-slate-300 text-2xl mb-2"></i><span class="text-xs text-slate-400 font-bold">上傳照片</span>`;
+            document.getElementById('diary-preview-container').innerHTML = ``;
             currentDiaryImages = [];
             if (mode === 'add') {
                 document.getElementById('diary-modal-title').innerText = "New Diary"; document.getElementById('diary-form').reset();
@@ -807,7 +1280,7 @@
             if (map && currentView === 'map') {
                 map.invalidateSize();
                 const controls = document.getElementById('mobile-controls');
-                if (window.innerWidth < 768) controls.style.bottom = '370px'; else controls.style.bottom = '24px';
+                if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
             }
         });
     </script>
