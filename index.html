@@ -674,25 +674,26 @@
             container.innerHTML = '';
             
             currentDiaryImages.forEach((item, index) => {
+                // 使用 getSource 判斷，不管是物件還是字串都能拿到 URL
+                const displaySrc = getSource(item, 'thumb');
                 const isVid = isVideo(item);
-                const displaySrc = getSource(item, 'thumb'); // 關鍵修正
                 
                 const mediaHtml = isVid 
-                    ? `<video src="${displaySrc}" class="w-full h-full object-cover" muted autoplay loop playsinline></video>`
+                    ? `<div class="relative w-full h-full">
+                        <img src="${displaySrc}" class="w-full h-full object-cover">
+                        <div class="video-indicator"><i class="fa-solid fa-play text-[8px]"></i></div>
+                    </div>`
                     : `<img src="${displaySrc}" class="w-full h-full object-cover">`;
 
                 const imgDiv = document.createElement('div');
                 imgDiv.className = "preview-img-wrapper relative group";
                 imgDiv.innerHTML = `
                     ${mediaHtml}
-                    <div class="preview-remove-btn" onclick="removeDiaryImage(${index})">
-                        <i class="fa-solid fa-trash text-xs"></i>
-                    </div>
+                    <div class="preview-remove-btn" onclick="removeDiaryImage(${index})"><i class="fa-solid fa-trash"></i></div>
                 `;
                 container.appendChild(imgDiv);
             });
         }
-
         function removeDiaryImage(index) {
             currentDiaryImages.splice(index, 1);
             renderDiaryPreview();
@@ -1206,32 +1207,47 @@
         }
 
         function renderDiaryAll() {
-            const container = document.getElementById('diary-list'); container.innerHTML = '';
-            if (diaries.length === 0) { container.innerHTML = `<div class="text-center text-slate-400 py-10">還沒有日記喔，快來寫下第一篇吧！</div>`; return; }
+            const container = document.getElementById('diary-list'); 
+            container.innerHTML = '';
+            
+            if (diaries.length === 0) { 
+                container.innerHTML = `<div class="text-center text-slate-400 py-10">還沒有日記喔！</div>`; 
+                return; 
+            }
+
             const sortedDiaries = [...diaries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
             sortedDiaries.forEach(diary => {
                 const isBoy = diary.author === 'boy';
-                const authorColor = isBoy ? 'text-blue-500' : 'text-themePink';
-                const authorBg = isBoy ? 'bg-blue-50' : 'bg-pink-50';
-                const authorIcon = isBoy ? 'fa-mars' : 'fa-venus';
+                
+                // --- 處理媒體內容 (相容新舊格式) ---
                 let imgsHtml = '';
-                if(diary.images && diary.images.length > 0) {
+                if (diary.images && diary.images.length > 0) {
                     const containerClass = diary.images.length > 1 ? 'diary-images-container multi' : 'diary-images-container';
-                    const imgs = diary.images.map((src, idx) => `
-                        <div class="diary-img-wrapper" onclick="openLightbox(${JSON.stringify(diary.images).replace(/"/g, '&quot;')}, ${idx})">
-                            <img src="${src}" class="diary-img">
-                        </div>
-                    `).join('');
-                    imgsHtml = `<div class="${containerClass}">${imgs}</div>`;
+                    
+                    const mediaItems = diary.images.map((item, idx) => {
+                        // 使用 getMediaTag 自動處理 <img> 或 <video>，並判斷新舊格式
+                        // 傳入 diary.images 讓 Lightbox 知道這組日記的所有照片
+                        return getMediaTag(item, "diary-img-wrapper", `onclick="openLightbox(${JSON.stringify(diary.images).replace(/"/g, '&quot;')}, ${idx})"`);
+                    }).join('');
+                    
+                    imgsHtml = `<div class="${containerClass}">${mediaItems}</div>`;
                 }
-                const card = document.createElement('div'); card.className = "diary-card";
+
+                const card = document.createElement('div'); 
+                card.className = "diary-card";
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                         <div class="flex items-center gap-2">
-                            <div class="${authorBg} ${authorColor} w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm"><i class="fa-solid ${authorIcon}"></i></div>
-                            <div class="flex flex-col"><span class="text-sm font-bold text-slate-700">${diary.date}</span></div>
+                            <div class="${isBoy ? 'bg-blue-50 text-blue-500' : 'bg-pink-50 text-themePink'} w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">
+                                <i class="fa-solid ${isBoy ? 'fa-mars' : 'fa-venus'}"></i>
+                            </div>
+                            <span class="text-sm font-bold text-slate-700">${diary.date}</span>
                         </div>
-                        <div class="flex gap-2"><button onclick="openDiaryModal('edit', '${diary.id}')" class="text-slate-300 hover:text-themeMain transition"><i class="fa-solid fa-pen"></i></button><button onclick="deleteDiary('${diary.id}')" class="text-slate-300 hover:text-themePink transition"><i class="fa-solid fa-trash-can"></i></button></div>
+                        <div class="flex gap-2">
+                            <button onclick="openDiaryModal('edit', '${diary.id}')" class="text-slate-300 hover:text-themeMain transition"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteDiary('${diary.id}')" class="text-slate-300 hover:text-themePink transition"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
                     </div>
                     ${imgsHtml}
                     <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">${diary.content}</div>

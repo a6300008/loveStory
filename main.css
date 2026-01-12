@@ -1,5 +1,27 @@
 .diary-images-container, .scrolling-images { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; }
 .diary-images-container img, .scrolling-images img { aspect-ratio: 1 /1; object-fit: cover; border-radius: 5px;}
+
+
+.diary-img-wrapper {
+    flex: 0 0 100%; /* 單張占滿 */
+    aspect-ratio: 16/9; /* 日記圖片可以用比較寬的比例 */
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background: #f1f5f9;
+}
+
+.diary-images-container.multi .diary-img-wrapper {
+    flex: 0 0 85%; /* 多張時露出下一張的一角 */
+}
+
+/* 讓圖片跟影片在 wrapper 裡填滿 */
+.diary-img-wrapper img, .diary-img-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 .leaflet-popup-content-wrapper {
     overflow: hidden;
 }
