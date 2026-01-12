@@ -141,10 +141,10 @@
             transition: all 0.2s;
         }
 
-        .drive-file-item.selected {
+        /* .drive-file-item.selected {
             border-color: #38bdf8;
             transform: scale(0.95);
-        }
+        } */
 
         /* 影片隱藏與顯示的動畫 */
         .video-hidden {
@@ -432,12 +432,17 @@
          */
         function isVideo(item) {
             if (!item) return false;
-            // 優先檢查新結構的 type 屬性
-            if (item.type) return item.type === 'video';
+    
+            // 1. 新版物件格式判斷
+            if (typeof item === 'object' && item !== null) {
+                return item.type === 'video';
+            }
             
-            // 備案：相容舊資料 (字串判斷)
-            const src = (typeof item === 'object') ? item.full : item;
-            return src && (src.includes('video') || src.includes('preview') || src.match(/\.(mp4|webm|mov)/i));
+            // 2. 舊版字串格式判斷 (備案)
+            const src = String(item);
+            return src.includes('video') || 
+                src.includes('preview') || 
+                src.match(/\.(mp4|webm|mov|quicktime)/i);
         }
         /**
          * 將 Google Drive 連結轉換為更穩定、支援串流的格式
@@ -1270,7 +1275,7 @@
                     currentDiaryImages = diary.images; const container = document.getElementById('diary-preview-container'); container.innerHTML = '';
                     diary.images.forEach(base64 => {
                         const div = document.createElement('div'); div.className = "w-20 h-20 rounded-lg overflow-hidden relative border border-slate-200 flex-shrink-0";
-                        div.innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`; container.appendChild(div);
+                        div.innerHTML = `<img src="${typeof base64 === 'object' ? base64.full : base64}" class="w-full h-full object-cover">`; container.appendChild(div);
                     });
                 }
             }
