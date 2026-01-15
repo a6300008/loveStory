@@ -115,3 +115,102 @@ h1 small {
         max-height: 70vh;
     }
 }
+
+/* 留言區容器 */
+.comment-section {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed #e2e8f0;
+}
+
+/* 留言氣泡 */
+.comment-bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 8px;
+    max-width: 90%;
+    position: relative;
+}
+.comment-boy { background: #eff6ff; color: #1e40af; align-self: flex-start; }
+.comment-girl { background: #fff1f2; color: #9f1239; align-self: flex-end; }
+
+/* 快速留言輸入框 */
+.comment-input-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+.comment-input {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 99px;
+    padding: 6px 16px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+.comment-input:focus { border-color: #38bdf8; background: white; }
+
+/* 留言身份切換按鈕 */
+.comment-author-toggle {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 99px;
+    padding: 3px;
+    gap: 2px;
+}
+.author-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #94a3b8;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+/* 選中狀態 */
+.author-btn.boy.active { background: #38bdf8; color: white; box-shadow: 0 2px 4px rgba(56, 189, 248, 0.3); }
+.author-btn.girl.active { background: #f43f5e; color: white; box-shadow: 0 2px 4px rgba(244, 63, 94, 0.3); }
+/* 傳送中的氣泡樣式 */
+.comment-sending {
+    opacity: 0.6;
+    filter: grayscale(0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 脈動動畫 */
+@keyframes commentPulse {
+    0% { opacity: 0.4; transform: scale(0.98); }
+    50% { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 0.4; transform: scale(0.98); }
+}
+.comment-sending {
+    animation: commentPulse 1.5s infinite ease-in-out;
+}
+
+/* 在氣泡旁加入一個微型讀取圖示 */
+.sending-tag {
+    font-size: 9px;
+    margin-left: 6px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* 輸入框停用時的視覺效果 */
+.comment-input:disabled {
+    background-color: #f1f5f9 !important;
+    cursor: not-allowed;
+}
+/* 加入到 style */
+.diary-img-wrapper img, .diary-img-wrapper video {
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+.diary-img-wrapper img[loading] {
+    filter: blur(10px);
+}

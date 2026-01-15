@@ -516,30 +516,23 @@
             if (file.type.startsWith('video/')) {
                 showLoading(true);
                 
-                // 1. 壓縮原片 (用於 Lightbox 展開看高清)
-                const fullRes = await compressVideo(file, { width: 854 }); 
-
-                // 2. 產生 2 秒 GIF 縮圖
-                const thumbRes = await new Promise((resolve) => {
-                    gifshot.createGIF({
-                        video: [URL.createObjectURL(file)],
-                        numFrames: 20,      // 2 秒內抓 20 張圖 (10 FPS)
-                        gifWidth: 320,      // 縮圖寬度
-                        gifHeight: 320,     // 縮圖高度
-                        interval: 0.1,      // 每 0.1 秒抓一幀
-                        sampleInterval: 10, // 畫質抽樣
-                    }, function (obj) {
-                        if (!obj.error) {
-                            resolve(obj.image); // 回傳 GIF Base64
-                        } else {
-                            console.error("GIF 產生失敗", obj.error);
-                            resolve(null);
-                        }
-                    });
-                });
+                // 同步執行：原片壓縮與 GIF 同時開始
+                const [fullRes, thumbRes] = await Promise.all([
+                    compressVideo(file, { width: 720 }), // 原片稍微降一點解析度到 720p 提高速度
+                    new Promise((resolve) => {
+                        gifshot.createGIF({
+                            video: [URL.createObjectURL(file)],
+                            numFrames: 12,      // 降低影格數 (由 20 降到 12)，合成速度快一倍
+                            gifWidth: 240,      // 縮小預覽圖尺寸
+                            gifHeight: 240,
+                            interval: 0.15,     // 稍微拉大間隔
+                            sampleInterval: 20, // 降低抽樣精密度以換取速度
+                        }, (obj) => resolve(obj.error ? null : obj.image));
+                    })
+                ]);
 
                 showLoading(false);
-                callback({ full: fullRes, thumb: thumbRes });
+                callback({ full: fullRes, thumb: thumbRes, type: 'video' });
             } else {
                 processImage(file, callback); 
             }
@@ -878,15 +871,26 @@
         function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
 
         async function fetchData(type) {
-            showLoading(true);
+            // 如果是切換分頁，且已經有資料了，就不要顯示全螢幕 Loading
+            const hasData = (type === 'map' ? spots.length : diaries.length) > 0;
+            if (!hasData) showLoading(true);
+
             try {
-                const response = await fetch(`${API_URL}?action=read&type=${type}&t=${new Date().getTime()}`);
-                if (!response.ok) throw new Error('Network error');
+                const response = await fetch(`${API_URL}?action=read&type=${type}&t=${Date.now()}`);
                 const data = await response.json();
-                if (type === 'map') { spots = data; renderMapAll(); } 
-                else { diaries = data; renderDiaryAll(); }
-            } catch (error) { alert("讀取失敗：" + error.message); } 
-            finally { showLoading(false); }
+                
+                if (type === 'map') {
+                    spots = data;
+                    renderMapAll();
+                } else {
+                    diaries = data;
+                    renderDiaryAll();
+                }
+            } catch (error) {
+                console.error("讀取失敗", error);
+            } finally {
+                showLoading(false);
+            }
         }
 
         async function sendData(action, type, data, modalId) {
@@ -1210,6 +1214,32 @@
             if(gender === 'boy') { boyBtn.classList.add('active'); girlBtn.classList.remove('active'); } 
             else { girlBtn.classList.add('active'); boyBtn.classList.remove('active'); }
         }
+        // 初始化留言身份，優先從 localStorage 讀取，預設為 'boy'
+        let globalCommentAuthor = localStorage.getItem('preferredCommentAuthor') || 'boy';
+        /**
+         * 全域切換留言身份
+         * @param {string} author - 'boy' 或 'girl'
+         */
+        function setGlobalCommentAuthor(author) {
+            globalCommentAuthor = author;
+            // 記憶到本地儲存
+            localStorage.setItem('preferredCommentAuthor', author);
+            
+            // 同步更新畫面上所有的留言切換按鈕
+            document.querySelectorAll('.comment-author-toggle').forEach(container => {
+                container.dataset.selected = author;
+                const boyBtn = container.querySelector('.author-btn.boy');
+                const girlBtn = container.querySelector('.author-btn.girl');
+                
+                if (author === 'boy') {
+                    boyBtn.classList.add('active');
+                    girlBtn.classList.remove('active');
+                } else {
+                    girlBtn.classList.add('active');
+                    boyBtn.classList.remove('active');
+                }
+            });
+        }
 
         function renderDiaryAll() {
             const container = document.getElementById('diary-list'); 
@@ -1225,28 +1255,36 @@
             sortedDiaries.forEach(diary => {
                 const isBoy = diary.author === 'boy';
                 
-                // --- 處理媒體內容 (相容新舊格式) ---
+                // 1. 處理媒體 (GIF/圖片) - 保持原有邏輯
                 let imgsHtml = '';
                 if (diary.images && diary.images.length > 0) {
                     const containerClass = diary.images.length > 1 ? 'diary-images-container multi' : 'diary-images-container';
-                    
-                    const mediaItems = diary.images.map((item, idx) => {
-                        // 使用 getMediaTag 自動處理 <img> 或 <video>，並判斷新舊格式
-                        // 傳入 diary.images 讓 Lightbox 知道這組日記的所有照片
-                        return getMediaTag(item, "diary-img-wrapper", `onclick="openLightbox(${JSON.stringify(diary.images).replace(/"/g, '&quot;')}, ${idx})"`);
-                    }).join('');
-                    
-                    imgsHtml = `<div class="${containerClass}">${mediaItems}</div>`;
+                    imgsHtml = `<div class="${containerClass}">` + 
+                        diary.images.map((item, idx) => getMediaTag(item, "diary-img-wrapper", `onclick="openLightbox(${JSON.stringify(diary.images).replace(/"/g, '&quot;')}, ${idx})"`)).join('') + 
+                    `</div>`;
                 }
+                const isBoyActive = globalCommentAuthor === 'boy';
+
+                // 2. 處理留言列表 - 保持原有邏輯
+                let commentsHtml = (diary.comments || []).map(c => `
+                    <div class="flex ${c.author === 'boy' ? '' : 'justify-end'} mb-2">
+                        <div class="comment-bubble ${c.author === 'boy' ? 'comment-boy' : 'comment-girl'}">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fa-solid ${c.author === 'boy' ? 'fa-mars text-[10px]' : 'fa-venus text-[10px]'}"></i>
+                                <span class="text-[10px] opacity-60">${c.time}</span>
+                            </div>
+                            <p class="m-0">${c.text}</p>
+                        </div>
+                    </div>
+                `).join('');
 
                 const card = document.createElement('div'); 
                 card.className = "diary-card";
                 card.innerHTML = `
+                    <!-- ... 日記標題與作者區 ... -->
                     <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                         <div class="flex items-center gap-2">
-                            <div class="${isBoy ? 'bg-blue-50 text-blue-500' : 'bg-pink-50 text-themePink'} w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">
-                                <i class="fa-solid ${isBoy ? 'fa-mars' : 'fa-venus'}"></i>
-                            </div>
+                            <div class="${isBoy ? 'bg-blue-50 text-blue-500' : 'bg-pink-50 text-themePink'} w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs"><i class="fa-solid ${isBoy ? 'fa-mars' : 'fa-venus'}"></i></div>
                             <span class="text-sm font-bold text-slate-700">${diary.date}</span>
                         </div>
                         <div class="flex gap-2">
@@ -1255,7 +1293,27 @@
                         </div>
                     </div>
                     ${imgsHtml}
-                    <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">${diary.content}</div>
+                    <div class="text-slate-600 text-sm leading-relaxed whitespace-pre-line mb-4">${diary.content}</div>
+                    
+                    <!-- 留言區 -->
+                    <div class="comment-section">
+                        <div id="comment-list-${diary.id}">${commentsHtml}</div>
+                        <div class="comment-input-group items-center">
+                            <!-- 修改：呼叫全域切換函式 setGlobalCommentAuthor -->
+                            <div class="comment-author-toggle" data-selected="${globalCommentAuthor}">
+                                <div onclick="setGlobalCommentAuthor('boy')" class="author-btn boy ${isBoyActive ? 'active' : ''}">
+                                    <i class="fa-solid fa-mars"></i>
+                                </div>
+                                <div onclick="setGlobalCommentAuthor('girl')" class="author-btn girl ${!isBoyActive ? 'active' : ''}">
+                                    <i class="fa-solid fa-venus"></i>
+                                </div>
+                            </div>
+                            <input type="text" id="input-${diary.id}" class="comment-input" placeholder="留個言吧...">
+                            <button onclick="addComment('${diary.id}')" class="w-8 h-8 rounded-full bg-themeMain text-white flex items-center justify-center shadow-sm active:scale-90 transition flex-shrink-0">
+                                <i class="fa-solid fa-paper-plane text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(card);
             });
@@ -1278,6 +1336,120 @@
                         div.innerHTML = `<img src="${typeof base64 === 'object' ? base64.full : base64}" class="w-full h-full object-cover">`; container.appendChild(div);
                     });
                 }
+            }
+        }
+        async function addComment(diaryId) {
+            const input = document.getElementById(`input-${diaryId}`);
+            const listContainer = document.getElementById(`comment-list-${diaryId}`);
+            const btn = input.nextElementSibling; // 取得發送按鈕
+            const icon = btn.querySelector('i');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            // --- 1. 立即防呆：按鈕立刻變轉圈圈 ---
+            const originalIconClass = icon.className;
+            icon.className = 'fa-solid fa-circle-notch fa-spin text-xs';
+            btn.disabled = true;
+            input.disabled = true;
+            // --- 2. 樂觀 UI：立刻在畫面上插入一個「傳送中」的假氣泡 ---
+            const now = new Date();
+            const timeStr = (now.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                            now.getDate().toString().padStart(2, '0') + ' ' + 
+                            now.getHours().toString().padStart(2, '0') + ':' + 
+                            now.getMinutes().toString().padStart(2, '0');
+            
+            const isBoy = globalCommentAuthor === 'boy';
+            const tempId = 'temp-comment-' + Date.now();
+            
+            const tempHtml = `
+                <div id="${tempId}" class="flex ${isBoy ? '' : 'justify-end'} mb-2 comment-sending">
+                    <div class="comment-bubble ${isBoy ? 'comment-boy' : 'comment-girl'}">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fa-solid ${isBoy ? 'fa-mars' : 'fa-venus'} text-[10px]"></i>
+                            <span class="text-[10px] opacity-60">${timeStr}</span>
+                            <span class="sending-tag"><i class="fa-solid fa-cloud-upload fa-bounce"></i> SENDING...</span>
+                        </div>
+                        <p class="m-0">${text}</p>
+                    </div>
+                </div>
+            `;
+            listContainer.insertAdjacentHTML('beforeend', tempHtml);
+            
+            // 自動捲動到底部，讓使用者看到新出的氣泡
+            listContainer.parentElement.scrollTop = listContainer.parentElement.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_URL}?action=add_comment&type=diary`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        id: diaryId,
+                        author: globalCommentAuthor,
+                        text: text
+                    }),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                
+                const result = await response.json();
+                if (result.status === "success") {
+                    input.value = "";
+                    // --- 2. 效能優化：不要全頁 fetchData，直接局部更新該日記的留言數據 ---
+                    // 重新讀取資料，但不顯示全螢幕 Loading
+                    await refreshCommentsSilently(diaryId); 
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (e) {
+                alert("傳送失敗");
+            } finally {
+                icon.className = originalIconClass;
+                btn.classList.remove('opacity-50', 'pointer-events-none');
+                input.disabled = false;
+                input.focus();
+            }
+        }
+        /**
+         * 靜默更新：背景抓取資料並重新渲染，不干擾使用者
+         */
+        async function refreshCommentsSilently(diaryId) {
+            // 這裡不呼叫 showLoading
+            const response = await fetch(`${API_URL}?action=read&type=diary&t=${Date.now()}`);
+            diaries = await response.json();
+            
+            // 重新渲染全部日記
+            renderDiaryAll();
+            
+            // 渲染完後，確保視窗依然停留在剛才那則日記的位置（可選，通常瀏覽器會自動處理捲動位置）
+        }
+        /**
+         * 局部更新特定日記的留言，避免全頁重刷的 Lag 感
+         */
+        async function updateSingleDiaryComments(diaryId) {
+            // 雖然還是向後端抓資料，但這次我們不呼叫 showLoading(true)
+            const response = await fetch(`${API_URL}?action=read&type=diary&t=${Date.now()}`);
+            const data = await response.json();
+            diaries = data; // 更新全域變數
+            
+            // 只重新渲染日記清單，但因為不經過 showLoading 畫面，體感會快非常多
+            renderDiaryAll();
+        }
+        /**
+         * 切換特定日記留言框的作者身分
+         */
+        function toggleCommentAuthor(diaryId, author) {
+            const toggleContainer = document.getElementById(`toggle-${diaryId}`);
+            const boyBtn = document.getElementById(`btn-boy-${diaryId}`);
+            const girlBtn = document.getElementById(`btn-girl-${diaryId}`);
+            
+            // 更新資料屬性
+            toggleContainer.dataset.selected = author;
+            
+            // 更新 UI 視覺
+            if (author === 'boy') {
+                boyBtn.classList.add('active');
+                girlBtn.classList.remove('active');
+            } else {
+                girlBtn.classList.add('active');
+                boyBtn.classList.remove('active');
             }
         }
         window.deleteDiary = function(id) { if(confirm('確定要刪除這篇日記嗎？')) sendData('delete', 'diary', { id: id }); };
