@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claire & Hiking 的河內悠閒時光 | 8天7夜專屬行程</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        light: '#F9FAFB',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F3F4F6; }
+        
+        /* 隱藏捲軸但保留捲動功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 時間軸樣式 */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 24px;
+            width: 4px;
+            background-color: #E5E7EB;
+        }
+        @media (min-width: 768px) {
+            .timeline-container::before { left: 50%; margin-left: -2px; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased">
+
+    <!-- 頂部導覽列 -->
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">✈️</span>
+                    <span class="font-bold text-xl text-primary">C & H Hanoi Trip</span>
+                </div>
+                <!-- 桌面版選單 -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#overview" class="text-gray-600 hover:text-primary transition">行程總覽</a>
+                    <a href="#transport" class="text-gray-600 hover:text-primary transition">交通與住宿</a>
+                    <a href="#itinerary" class="text-gray-600 hover:text-primary transition">每日行程</a>
+                    <a href="#food" class="text-gray-600 hover:text-primary transition">美食地圖</a>
+                    <a href="#prep" class="text-gray-600 hover:text-primary transition">行前準備</a>
+                </div>
+                <!-- 手機版選單按鈕 -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 text-3xl focus:outline-none">☰</button>
+                </div>
+            </div>
+        </div>
+        <!-- 手機版下拉選單 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+            <a href="#overview" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">行程總覽</a>
+            <a href="#transport" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">交通與住宿</a>
+            <a href="#itinerary" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">每日行程</a>
+            <a href="#food" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">美食地圖</a>
+            <a href="#prep" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">行前準備</a>
+        </div>
+    </nav>
+
+    <!-- 行程總覽 (Hero Section) -->
+    <section id="overview" class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-primary to-indigo-600 py-16 px-8 text-white text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">河內 8天7夜 悠閒美食之旅</h1>
+                <p class="text-lg md:text-xl text-indigo-100">輕鬆自在・保留彈性・品味北越風情</p>
+                <div class="mt-8 flex flex-wrap justify-center gap-4 text-sm md:text-base">
+                    <span class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">🗓️ 日期：3/28 - 4/4</span>
+                    <span class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">👥 成員：Claire & Hiking</span>
+                    <span class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">📍 目的地：越南 河內、下龍灣、陸龍灣</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 交通與住宿 -->
+    <section id="transport" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center"><span class="mr-3 text-3xl">🏨</span> 交通與住宿資訊</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- 航班資訊 -->
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                <h3 class="text-xl font-bold mb-4 text-primary border-b pb-2 flex items-center"><span class="mr-2">✈️</span> 航班時刻表</h3>
+                <div class="space-y-4">
+                    <div class="bg-indigo-50 p-4 rounded-xl">
+                        <h4 class="font-bold text-gray-800">去程 (3/28)</h4>
+                        <ul class="mt-2 text-sm text-gray-600 space-y-1">
+                            <li>👩 <span class="font-semibold text-primary">Claire:</span> 抵達排內機場 (HAN) 10:20 AM</li>
+                            <li>👨 <span class="font-semibold text-secondary">Hiking:</span> 抵達排內機場 (HAN) 02:10 PM</li>
+                        </ul>
+                        <p class="text-xs text-gray-500 mt-2">💡 建議：Claire 先搭車前往市區放行李吃午餐，Hiking 抵達後再搭車會合。</p>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-xl">
+                        <h4 class="font-bold text-gray-800">回程 (4/4)</h4>
+                        <ul class="mt-2 text-sm text-gray-600 space-y-1">
+                            <li>👩 <span class="font-semibold text-primary">Claire:</span> 班機起飛 11:30 AM (建議 08:30 出發)</li>
+                            <li>👨 <span class="font-semibold text-secondary">Hiking:</span> 班機起飛 02:25 PM (建議 11:20 出發)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 住宿資訊 -->
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                <h3 class="text-xl font-bold mb-4 text-primary border-b pb-2 flex items-center"><span class="mr-2">🛏️</span> 住宿安排</h3>
+                <div class="space-y-4">
+                    <div class="p-4 border border-gray-100 rounded-xl hover:shadow-md transition">
+                        <h4 class="font-bold text-gray-800">3/28 - 3/30 (2晚)</h4>
+                        <p class="text-primary font-medium">Căn hộ tại Hoàn Kiếm</p>
+                        <p class="text-sm text-gray-600 mt-1">📍 1 Ngõ 29, Hoàn Kiếm, Hà Nội</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=1+Ngõ+29,+Hoàn+Kiếm,+Hà+Nội" target="_blank" class="inline-block mt-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full">🗺️ Google Maps</a>
+                    </div>
+                    <div class="p-4 border border-gray-100 rounded-xl hover:shadow-md transition">
+                        <h4 class="font-bold text-gray-800">3/31 - 4/4 (4晚)</h4>
+                        <p class="text-primary font-medium">Dechill House</p>
+                        <p class="text-sm text-gray-600 mt-1">📍 P. Lý Nam Đế, Quán Thánh, Hoàn Kiếm</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Dechill+House+Lý+Nam+Đế+Hà+Nội" target="_blank" class="inline-block mt-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full">🗺️ Google Maps</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 數據圖表區 -->
+        <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+            <h3 class="text-xl font-bold mb-4 text-primary border-b pb-2 flex items-center"><span class="mr-2">📊</span> 機場前往市區交通方式比較</h3>
+            <p class="text-sm text-gray-500 mb-4">您可以點擊圖表標籤進行互動。推薦使用 Grab 或預約專車，以節省時間與體力。</p>
+            <div class="relative h-64 w-full">
+                <canvas id="transportChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- 每日行程 -->
+    <section id="itinerary" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white rounded-3xl shadow-sm mt-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center"><span class="mr-3 text-3xl">📅</span> 每日行程規劃</h2>
+        <p class="text-gray-600 mb-8">行程以「保持彈性、享受當下」為原則，可根據當日心情調整。所有景點與路線皆附上導航連結。</p>
+        
+        <div class="relative timeline-container py-8">
+            
+            <!-- Day 1 -->
+            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
+                <div class="hidden md:block md:w-5/12 text-right pr-8">
+                    <h3 class="text-2xl font-bold text-primary">Day 1 • 3/28 (六)</h3>
+                    <p class="text-gray-500 font-medium">抵達河內，雙人會合</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-primary border-4 border-white shadow flex items-center justify-center text-white text-xs">1</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-primary">Day 1 • 3/28 (六)</h3>
+                        <p class="text-gray-500 font-medium">抵達河內，雙人會合</p>
+                    </div>
+                    <div class="bg-indigo-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:20 - 12:00</div>
+                                <div class="font-bold">Claire 抵達機場前往市區</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚗</span> 搭乘 Grab (約45分)</div>
+                                <a href="https://www.google.com/maps/dir/?api=1&origin=Noi+Bai+International+Airport&destination=1+Ngo+29,+Hoan+Kiem,+Hanoi&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 導航路線</a>
+                            </li>
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 14:10 - 16:00</div>
+                                <div class="font-bold">Hiking 抵達機場前往市區</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🏨</span> 入住 Căn hộ tại Hoàn Kiếm</div>
+                            </li>
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 16:30 (停留約 1.5H)</div>
+                                <div class="font-bold">還劍湖與玉山祠漫步</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚶</span> 步行前往</div>
+                                <a href="https://www.google.com/maps/dir/?api=1&origin=1+Ngo+29,+Hoan+Kiem,+Hanoi&destination=Hoan+Kiem+Lake&travelmode=walking" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1 mr-2">🔗 導航路線</a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Ngoc+Son+Temple+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
+                            </li>
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 18:30</div>
+                                <div class="font-bold">晚餐：Pho Thin Bờ Hồ (河粉老店)</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 2 -->
+            <div class="relative z-10 mb-16 md:flex md:justify-between items-center flex-row-reverse group">
+                <div class="hidden md:block md:w-5/12 text-left pl-8">
+                    <h3 class="text-2xl font-bold text-secondary">Day 2 • 3/29 (日)</h3>
+                    <p class="text-gray-500 font-medium">法式風情與運動時光</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-secondary border-4 border-white shadow flex items-center justify-center text-white text-xs">2</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-secondary">Day 2 • 3/29 (日)</h3>
+                        <p class="text-gray-500 font-medium">法式風情與運動時光</p>
+                    </div>
+                    <div class="bg-green-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:00 (停留約 1H)</div>
+                                <div class="font-bold">聖約瑟夫天主堂 (大教堂)</div>
+                                <div class="text-sm text-gray-600 mt-1">周圍有很多露天咖啡座，可品嚐蛋黃咖啡。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=St.+Joseph's+Cathedral,+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
+                            </li>
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 12:30</div>
+                                <div class="font-bold">午餐：Bun Cha Huong Lien (歐巴馬烤肉米線)</div>
+                            </li>
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 15:00 - 17:00 (停留約 2H)</div>
+                                <div class="font-bold text-green-700">🎾 匹克球 (Pickleball) 運動</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚕</span> 搭乘 Grab 前往當地網球/匹克球俱樂部</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Pickleball+court+Hanoi" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">📍 尋找周邊球場</a>
+                            </li>
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 19:00</div>
+                                <div class="font-bold">三十六古街夜市 / Ta Hien 啤酒街</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 3 -->
+            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
+                <div class="hidden md:block md:w-5/12 text-right pr-8">
+                    <h3 class="text-2xl font-bold text-accent">Day 3 • 3/30 (一)</h3>
+                    <p class="text-gray-500 font-medium">下龍灣豪華郵輪 (已預訂)</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-accent border-4 border-white shadow flex items-center justify-center text-white text-xs">3</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-accent">Day 3 • 3/30 (一)</h3>
+                        <p class="text-gray-500 font-medium">下龍灣豪華郵輪 (已預訂)</p>
+                    </div>
+                    <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-yellow-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 08:00 - 11:30</div>
+                                <div class="font-bold">搭乘郵輪接駁車前往下龍灣</div>
+                                <div class="text-sm text-gray-600 mt-1">將大件行李寄放於原飯店或攜帶上船。</div>
+                            </li>
+                            <li class="border-l-2 border-yellow-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 12:00 - 13:00</div>
+                                <div class="font-bold">抵達碼頭，辦理登船手續</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Halong+International+Cruise+Port" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 碼頭位置</a>
+                            </li>
+                            <li class="border-l-2 border-yellow-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 下午至晚上</div>
+                                <div class="font-bold">郵輪活動 (鐘乳石洞探險/獨木舟/甲板晚餐)</div>
+                                <div class="text-sm text-gray-600 mt-1">🚢 盡情享受海上豪華時光。</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 4 -->
+            <div class="relative z-10 mb-16 md:flex md:justify-between items-center flex-row-reverse group">
+                <div class="hidden md:block md:w-5/12 text-left pl-8">
+                    <h3 class="text-2xl font-bold text-gray-700">Day 4 • 3/31 (二)</h3>
+                    <p class="text-gray-500 font-medium">返回河內，入住新民宿</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-500 border-4 border-white shadow flex items-center justify-center text-white text-xs">4</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-gray-700">Day 4 • 3/31 (二)</h3>
+                        <p class="text-gray-500 font-medium">返回河內，入住新民宿</p>
+                    </div>
+                    <div class="bg-gray-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-gray-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 上午</div>
+                                <div class="font-bold">郵輪太極拳活動、早午餐後下船</div>
+                            </li>
+                            <li class="border-l-2 border-gray-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 14:30</div>
+                                <div class="font-bold">返回河內，入住 Dechill House</div>
+                                <a href="https://www.google.com/maps/dir/?api=1&origin=Halong+Bay&destination=Dechill+House+Lý+Nam+Đế+Hà+Nội&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 回程導航</a>
+                            </li>
+                            <li class="border-l-2 border-gray-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 16:00 (停留約 2H)</div>
+                                <div class="font-bold">越式越式洗頭或全身按摩 (Omamori Spa)</div>
+                                <div class="text-sm text-gray-600 mt-1">洗去兩天搭船的疲勞。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Omamori+Spa+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 尋找地圖</a>
+                            </li>
+                            <li class="border-l-2 border-gray-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 18:30</div>
+                                <div class="font-bold">晚餐：Banh Cuon Gia Truyen (越式腸粉)</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 5 -->
+            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
+                <div class="hidden md:block md:w-5/12 text-right pr-8">
+                    <h3 class="text-2xl font-bold text-primary">Day 5 • 4/1 (三)</h3>
+                    <p class="text-gray-500 font-medium">鐵道風情與西湖日落</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-primary border-4 border-white shadow flex items-center justify-center text-white text-xs">5</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-primary">Day 5 • 4/1 (三)</h3>
+                        <p class="text-gray-500 font-medium">鐵道風情與西湖日落</p>
+                    </div>
+                    <div class="bg-indigo-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:30 (停留約 1.5H)</div>
+                                <div class="font-bold">河內火車街 (Hanoi Train Street)</div>
+                                <div class="text-sm text-gray-600 mt-1">找間鐵道旁的咖啡廳等待火車經過。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Hanoi+Train+Street" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
+                            </li>
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 12:30</div>
+                                <div class="font-bold">午餐：Banh Mi 25 (超人氣法國麵包)</div>
+                            </li>
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 15:00 (停留約 2.5H)</div>
+                                <div class="font-bold">西湖 (Tay Ho) & 鎮國寺漫步</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚕</span> 搭乘 Grab 前往西湖區 (約15分)</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Tran+Quoc+Pagoda+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
+                            </li>
+                            <li class="border-l-2 border-indigo-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 18:30</div>
+                                <div class="font-bold">晚餐：Cau Go Vietnamese Cuisine</div>
+                                <div class="text-sm text-gray-600 mt-1">可俯瞰還劍湖夜景的精緻餐廳。</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 6 -->
+            <div class="relative z-10 mb-16 md:flex md:justify-between items-center flex-row-reverse group">
+                <div class="hidden md:block md:w-5/12 text-left pl-8">
+                    <h3 class="text-2xl font-bold text-secondary">Day 6 • 4/2 (四)</h3>
+                    <p class="text-gray-500 font-medium">陸龍灣一日遊 (預計行程)</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-secondary border-4 border-white shadow flex items-center justify-center text-white text-xs">6</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-secondary">Day 6 • 4/2 (四)</h3>
+                        <p class="text-gray-500 font-medium">陸龍灣一日遊 (預計行程)</p>
+                    </div>
+                    <div class="bg-green-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 07:30 - 10:00</div>
+                                <div class="font-bold">專車接送前往寧平 (Ninh Binh)</div>
+                                <a href="https://www.google.com/maps/dir/?api=1&origin=Dechill+House+Hanoi&destination=Trang+An+Ninh+Binh&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 乘車路線參考</a>
+                            </li>
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:30 (停留約 1.5H)</div>
+                                <div class="font-bold">華閭古都 (Hoa Lu) 歷史巡禮</div>
+                            </li>
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 13:30 (停留約 2H)</div>
+                                <div class="font-bold">長安 (Trang An) 手搖船秘境探險</div>
+                                <div class="text-sm text-gray-600 mt-1">🚣 穿梭於喀斯特地貌與石灰岩洞中。</div>
+                            </li>
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 16:00 (停留約 1.5H)</div>
+                                <div class="font-bold">臥龍山 (Hang Mua) 階梯健行看夕陽</div>
+                                <div class="text-sm text-gray-600 mt-1">需爬約500階，風景極佳！</div>
+                            </li>
+                            <li class="border-l-2 border-green-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 19:30</div>
+                                <div class="font-bold">返回河內市區，享用輕便晚餐 (Pho Gia Truyen Bat Dan)</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 7 -->
+            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
+                <div class="hidden md:block md:w-5/12 text-right pr-8">
+                    <h3 class="text-2xl font-bold text-accent">Day 7 • 4/3 (五)</h3>
+                    <p class="text-gray-500 font-medium">PPA賽事與球友之夜</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-accent border-4 border-white shadow flex items-center justify-center text-white text-xs">7</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-accent">Day 7 • 4/3 (五)</h3>
+                        <p class="text-gray-500 font-medium">PPA賽事與球友之夜</p>
+                    </div>
+                    <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-yellow-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 上午 (彈性行程)</div>
+                                <div class="font-bold">睡到自然醒 / 同春市場採買伴手禮</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Dong+Xuan+Market+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
+                            </li>
+                            <li class="border-l-2 border-yellow-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 下午</div>
+                                <div class="font-bold text-primary">🎾 觀賞 PPA (Pickleball) 比賽</div>
+                                <div class="text-sm text-gray-600 mt-1">前往指定賽事場館感受熱血氛圍！</div>
+                            </li>
+                            <li class="border-l-2 border-yellow-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 19:00</div>
+                                <div class="font-bold">🍻 與匹克球球友聚餐</div>
+                                <div class="text-sm text-gray-600 mt-1">推薦前往 Quan An Ngon (越式精緻料理庭園餐廳)，適合多人聚餐。</div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Quan+An+Ngon+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 餐廳資訊</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 8 -->
+            <div class="relative z-10 md:flex md:justify-between items-center flex-row-reverse group">
+                <div class="hidden md:block md:w-5/12 text-left pl-8">
+                    <h3 class="text-2xl font-bold text-gray-700">Day 8 • 4/4 (六)</h3>
+                    <p class="text-gray-500 font-medium">賦歸</p>
+                </div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-500 border-4 border-white shadow flex items-center justify-center text-white text-xs">8</div>
+                <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
+                    <div class="md:hidden mb-4">
+                        <h3 class="text-2xl font-bold text-gray-700">Day 8 • 4/4 (六)</h3>
+                        <p class="text-gray-500 font-medium">賦歸</p>
+                    </div>
+                    <div class="bg-gray-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <ul class="space-y-4">
+                            <li class="border-l-2 border-gray-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 07:30</div>
+                                <div class="font-bold">民宿周邊享用最後的越式河粉</div>
+                            </li>
+                            <li class="border-l-2 border-gray-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 08:30</div>
+                                <div class="font-bold text-primary">Claire 前往機場 (11:30 班機)</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚕</span> 搭乘 Grab 前往機場</div>
+                                <a href="https://www.google.com/maps/dir/?api=1&origin=Dechill+House+Hanoi&destination=Noi+Bai+International+Airport&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 導航路線</a>
+                            </li>
+                            <li class="border-l-2 border-gray-300 pl-4">
+                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 11:20</div>
+                                <div class="font-bold text-secondary">Hiking 前往機場 (14:25 班機)</div>
+                                <div class="text-sm text-gray-600 mt-1">（Hiking 早上可多睡一會，或在咖啡廳整理照片後再出發）</div>
+                                <a href="https://www.google.com/maps/dir/?api=1&origin=Dechill+House+Hanoi&destination=Noi+Bai+International+Airport&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 導航路線</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 美食地圖 (具備篩選功能) -->
+    <section id="food" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center"><span class="mr-3 text-3xl">🍜</span> 必吃美食地圖</h2>
+        
+        <!-- 篩選器 -->
+        <div class="flex flex-wrap gap-2 mb-8 justify-center md:justify-start">
+            <button class="filter-btn active bg-primary text-white px-4 py-2 rounded-full text-sm font-medium transition hover:shadow-md" data-filter="all">全部美食</button>
+            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="pho">主食河粉</button>
+            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="street">街頭小吃</button>
+            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="cafe">特色咖啡</button>
+            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="restaurant">聚餐餐廳</button>
+        </div>
+
+        <!-- 美食卡片網格 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="food-gallery">
+            <!-- Item 1 -->
+            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="pho">
+                <div class="text-3xl mb-2">🍜</div>
+                <h3 class="font-bold text-lg text-gray-800">Pho Thin Bờ Hồ</h3>
+                <p class="text-sm text-gray-500 mb-3">還劍湖旁的超人氣清燉牛肉河粉老店，湯頭鮮甜不死鹹。</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Pho+Thin+Bo+Ho+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+            </div>
+            <!-- Item 2 -->
+            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="street">
+                <div class="text-3xl mb-2">🥖</div>
+                <h3 class="font-bold text-lg text-gray-800">Banh Mi 25</h3>
+                <p class="text-sm text-gray-500 mb-3">觀光客必吃的法國麵包，外酥內軟，餡料豐富，且環境衛生。</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+Mi+25+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+            </div>
+            <!-- Item 3 -->
+            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="street">
+                <div class="text-3xl mb-2">🍢</div>
+                <h3 class="font-bold text-lg text-gray-800">Bun Cha Huong Lien</h3>
+                <p class="text-sm text-gray-500 mb-3">鼎鼎大名的「歐巴馬烤肉米線」，點一份歐巴馬套餐絕對過癮。</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Bun+Cha+Huong+Lien+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+            </div>
+            <!-- Item 4 -->
+            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="cafe">
+                <div class="text-3xl mb-2">☕</div>
+                <h3 class="font-bold text-lg text-gray-800">Cafe Giang (蛋咖啡)</h3>
+                <p class="text-sm text-gray-500 mb-3">河內蛋黃咖啡的創始店，口感像液體提拉米蘇，香濃順口。</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cafe+Giang+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+            </div>
+            <!-- Item 5 -->
+            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="restaurant">
+                <div class="text-3xl mb-2">🐟</div>
+                <h3 class="font-bold text-lg text-gray-800">Cha Ca Thang Long</h3>
+                <p class="text-sm text-gray-500 mb-3">古街區著名的鱧魚鍋，將薑黃魚塊與大量蒔蘿拌炒，風味獨特。</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cha+Ca+Thang+Long+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+            </div>
+            <!-- Item 6 -->
+            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="restaurant">
+                <div class="text-3xl mb-2">🍽️</div>
+                <h3 class="font-bold text-lg text-gray-800">Quan An Ngon</h3>
+                <p class="text-sm text-gray-500 mb-3">庭園式餐廳，集合了越南各地的特色小吃，非常適合跟球友聚餐！</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Quan+An+Ngon+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 行前準備 -->
+    <section id="prep" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center"><span class="mr-3 text-3xl">🎒</span> 行前準備與實用資訊</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-indigo-600 text-white p-6 rounded-2xl shadow-md">
+                <h3 class="font-bold text-lg mb-2 flex items-center"><span class="mr-2">📄</span> 簽證與網路</h3>
+                <ul class="space-y-2 text-indigo-100 text-sm">
+                    <li>• 記得提早申請越南電子簽證 (e-Visa)。</li>
+                    <li>• 建議先在台灣買好 eSIM，下機馬上就能聯絡雙方。</li>
+                    <li>• 下載 Grab App 。</li>
+                </ul>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                <h3 class="font-bold text-lg mb-2 text-gray-800 flex items-center"><span class="mr-2">💵</span> 換匯與消費</h3>
+                <ul class="space-y-2 text-gray-600 text-sm">
+                    <li>• 攜帶台幣或美金到河內古街的「銀樓」換匯匯率較佳。</li>
+                    <li>• 河內小吃多收現金，高級餐廳可刷卡。</li>
+                    <li>• 10,000 越盾大約等於 13 台幣。</li>
+                </ul>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                <h3 class="font-bold text-lg mb-2 text-gray-800 flex items-center"><span class="mr-2">🎽</span> 打球與穿著準備</h3>
+                <ul class="space-y-2 text-gray-600 text-sm">
+                    <li>• 記得帶上自己慣用的匹克球拍與運動服裝。</li>
+                    <li>• 4月初河內天氣漸暖，日夜溫差大，建議採洋蔥式穿搭。</li>
+                    <li>• 下龍灣海風較大，可準備一件防風薄外套。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 -->
+    <footer class="bg-gray-800 text-gray-300 py-8 text-center text-sm">
+        <p>為 Claire & Hiking 客製化設計的專屬行程表 💖 祝您們旅途愉快！</p>
+    </footer>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 手機版選單切換
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // 點擊手機版選單連結後自動收合
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // 美食篩選器邏輯
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const foodCards = document.querySelectorAll('.food-card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 更新按鈕樣式
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-white', 'text-gray-600');
+                    });
+                    btn.classList.remove('bg-white', 'text-gray-600');
+                    btn.classList.add('bg-primary', 'text-white');
+
+                    // 篩選卡片
+                    const filterValue = btn.getAttribute('data-filter');
+                    foodCards.forEach(card => {
+                        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                            card.style.display = 'block';
+                            // 加上簡單的淡入動畫效果
+                            card.animate([
+                                { opacity: 0, transform: 'scale(0.95)' },
+                                { opacity: 1, transform: 'scale(1)' }
+                            ], { duration: 300, fill: 'forwards' });
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Chart.js 交通比較圖表初始化
+            const ctx = document.getElementById('transportChart').getContext('2d');
+            
+            // 定義漸層色
+            const gradientCost = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientCost.addColorStop(0, 'rgba(79, 70, 229, 0.8)'); // Primary color
+            gradientCost.addColorStop(1, 'rgba(79, 70, 229, 0.2)');
+
+            const gradientTime = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientTime.addColorStop(0, 'rgba(16, 185, 129, 0.8)'); // Secondary color
+            gradientTime.addColorStop(1, 'rgba(16, 185, 129, 0.2)');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels:['86號公車', 'Grab App叫車', '預約專車接送'],
+                    datasets:[
+                        {
+                            label: '預估時間 (分鐘)',
+                            data:[60, 45, 40],
+                            backgroundColor: gradientTime,
+                            borderColor: '#10B981',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '預估花費 (千越盾 VND)',
+                            data:[45, 300, 350],
+                            backgroundColor: gradientCost,
+                            borderColor: '#4F46E5',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: 'rgba(31, 41, 55, 0.9)',
+                            titleFont: { size: 14, family: "'Noto Sans TC', sans-serif" },
+                            bodyFont: { size: 13, family: "'Noto Sans TC', sans-serif" },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.datasetIndex === 1) {
+                                        label += context.raw + 'k VND';
+                                    } else {
+                                        label += context.raw + ' 分鐘';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            labels: {
+                                font: { family: "'Noto Sans TC', sans-serif" },
+                                usePointStyle: true,
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: "'Noto Sans TC', sans-serif" } }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: '時間 (分鐘)', font: { family: "'Noto Sans TC', sans-serif" } },
+                            grid: { borderDash: [4, 4] },
+                            min: 0,
+                            max: 80
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: '花費 (千越盾)', font: { family: "'Noto Sans TC', sans-serif" } },
+                            grid: { drawOnChartArea: false },
+                            min: 0,
+                            max: 400
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
