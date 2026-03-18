@@ -20,7 +20,7 @@
                         dark: '#1F2937'
                     },
                     fontFamily: {
-                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        sans:['"Noto Sans TC"', 'sans-serif'],
                     }
                 }
             }
@@ -61,11 +61,11 @@
                 </div>
                 <!-- 桌面版選單 -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#overview" class="text-gray-600 hover:text-primary transition">行程總覽</a>
-                    <a href="#transport" class="text-gray-600 hover:text-primary transition">交通與住宿</a>
-                    <a href="#itinerary" class="text-gray-600 hover:text-primary transition">每日行程</a>
-                    <a href="#food" class="text-gray-600 hover:text-primary transition">美食地圖</a>
-                    <a href="#prep" class="text-gray-600 hover:text-primary transition">行前準備</a>
+                    <a href="#overview" class="text-gray-600 hover:text-primary transition font-medium">行程總覽</a>
+                    <a href="#transport" class="text-gray-600 hover:text-primary transition font-medium">交通與住宿</a>
+                    <a href="#itinerary" class="text-gray-600 hover:text-primary transition font-medium">每日行程</a>
+                    <a href="#places" class="text-gray-600 hover:text-primary transition font-medium">地點總覽地圖</a>
+                    <a href="#prep" class="text-gray-600 hover:text-primary transition font-medium">行前準備</a>
                 </div>
                 <!-- 手機版選單按鈕 -->
                 <div class="md:hidden flex items-center">
@@ -74,12 +74,12 @@
             </div>
         </div>
         <!-- 手機版下拉選單 -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
-            <a href="#overview" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">行程總覽</a>
-            <a href="#transport" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">交通與住宿</a>
-            <a href="#itinerary" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">每日行程</a>
-            <a href="#food" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">美食地圖</a>
-            <a href="#prep" class="block px-4 py-2 text-gray-600 hover:bg-gray-50">行前準備</a>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full">
+            <a href="#overview" class="block px-4 py-3 text-gray-600 hover:bg-gray-50 border-b border-gray-50">行程總覽</a>
+            <a href="#transport" class="block px-4 py-3 text-gray-600 hover:bg-gray-50 border-b border-gray-50">交通與住宿</a>
+            <a href="#itinerary" class="block px-4 py-3 text-gray-600 hover:bg-gray-50 border-b border-gray-50">每日行程</a>
+            <a href="#places" class="block px-4 py-3 text-gray-600 hover:bg-gray-50 border-b border-gray-50">地點總覽地圖</a>
+            <a href="#prep" class="block px-4 py-3 text-gray-600 hover:bg-gray-50">行前準備</a>
         </div>
     </nav>
 
@@ -92,7 +92,7 @@
                 <div class="mt-8 flex flex-wrap justify-center gap-4 text-sm md:text-base">
                     <span class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">🗓️ 日期：3/28 - 4/4</span>
                     <span class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">👥 成員：Claire & Hiking</span>
-                    <span class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">📍 目的地：越南 河內、下龍灣、陸龍灣</span>
+                    <span class="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">📍 目的地：河內、下龍灣、陸龍灣</span>
                 </div>
             </div>
         </div>
@@ -113,7 +113,6 @@
                             <li>👩 <span class="font-semibold text-primary">Claire:</span> 抵達排內機場 (HAN) 10:20 AM</li>
                             <li>👨 <span class="font-semibold text-secondary">Hiking:</span> 抵達排內機場 (HAN) 02:10 PM</li>
                         </ul>
-                        <p class="text-xs text-gray-500 mt-2">💡 建議：Claire 先搭車前往市區放行李吃午餐，Hiking 抵達後再搭車會合。</p>
                     </div>
                     <div class="bg-indigo-50 p-4 rounded-xl">
                         <h4 class="font-bold text-gray-800">回程 (4/4)</h4>
@@ -155,377 +154,469 @@
         </div>
     </section>
 
-    <!-- 每日行程 -->
+    <!-- 每日行程 (精簡版展示，依您需求保留結構) -->
     <section id="itinerary" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white rounded-3xl shadow-sm mt-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center"><span class="mr-3 text-3xl">📅</span> 每日行程規劃</h2>
-        <p class="text-gray-600 mb-8">行程以「保持彈性、享受當下」為原則，可根據當日心情調整。所有景點與路線皆附上導航連結。</p>
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center"><span class="mr-3 text-3xl">📅</span> 每日行程總覽</h2>
+        <p class="text-gray-600 mb-8">結合了景點漫遊、匹克球運動與下龍灣、陸龍灣的行程。詳細的「單點推薦」請參考下方的地點清單！</p>
         
-        <div class="relative timeline-container py-8">
-            
+        <div class="relative timeline-container py-4">
             <!-- Day 1 -->
-            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
+            <div class="relative z-10 mb-8 md:flex md:justify-between items-center group">
                 <div class="hidden md:block md:w-5/12 text-right pr-8">
-                    <h3 class="text-2xl font-bold text-primary">Day 1 • 3/28 (六)</h3>
-                    <p class="text-gray-500 font-medium">抵達河內，雙人會合</p>
+                    <h3 class="text-xl font-bold text-primary">Day 1 • 3/28 (六)</h3><p class="text-gray-500 text-sm">抵達河內，雙人會合</p>
                 </div>
                 <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-primary border-4 border-white shadow flex items-center justify-center text-white text-xs">1</div>
                 <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-primary">Day 1 • 3/28 (六)</h3>
-                        <p class="text-gray-500 font-medium">抵達河內，雙人會合</p>
-                    </div>
-                    <div class="bg-indigo-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:20 - 12:00</div>
-                                <div class="font-bold">Claire 抵達機場前往市區</div>
-                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚗</span> 搭乘 Grab (約45分)</div>
-                                <a href="https://www.google.com/maps/dir/?api=1&origin=Noi+Bai+International+Airport&destination=1+Ngo+29,+Hoan+Kiem,+Hanoi&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 導航路線</a>
-                            </li>
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 14:10 - 16:00</div>
-                                <div class="font-bold">Hiking 抵達機場前往市區</div>
-                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🏨</span> 入住 Căn hộ tại Hoàn Kiếm</div>
-                            </li>
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 16:30 (停留約 1.5H)</div>
-                                <div class="font-bold">還劍湖與玉山祠漫步</div>
-                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚶</span> 步行前往</div>
-                                <a href="https://www.google.com/maps/dir/?api=1&origin=1+Ngo+29,+Hoan+Kiem,+Hanoi&destination=Hoan+Kiem+Lake&travelmode=walking" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1 mr-2">🔗 導航路線</a>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Ngoc+Son+Temple+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
-                            </li>
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 18:30</div>
-                                <div class="font-bold">晚餐：Pho Thin Bờ Hồ (河粉老店)</div>
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-xl shadow-sm"><p class="font-bold">機場交通與還劍湖漫步</p><p class="text-sm text-gray-600 mt-1">10:20 Claire 抵達 / 14:10 Hiking 抵達，傍晚還劍湖周邊吃河粉。</p></div>
                 </div>
             </div>
-
             <!-- Day 2 -->
-            <div class="relative z-10 mb-16 md:flex md:justify-between items-center flex-row-reverse group">
+            <div class="relative z-10 mb-8 md:flex md:justify-between items-center flex-row-reverse group">
                 <div class="hidden md:block md:w-5/12 text-left pl-8">
-                    <h3 class="text-2xl font-bold text-secondary">Day 2 • 3/29 (日)</h3>
-                    <p class="text-gray-500 font-medium">法式風情與運動時光</p>
+                    <h3 class="text-xl font-bold text-secondary">Day 2 • 3/29 (日)</h3><p class="text-gray-500 text-sm">市區漫遊與匹克球</p>
                 </div>
                 <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-secondary border-4 border-white shadow flex items-center justify-center text-white text-xs">2</div>
                 <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-secondary">Day 2 • 3/29 (日)</h3>
-                        <p class="text-gray-500 font-medium">法式風情與運動時光</p>
-                    </div>
-                    <div class="bg-green-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:00 (停留約 1H)</div>
-                                <div class="font-bold">聖約瑟夫天主堂 (大教堂)</div>
-                                <div class="text-sm text-gray-600 mt-1">周圍有很多露天咖啡座，可品嚐蛋黃咖啡。</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=St.+Joseph's+Cathedral,+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
-                            </li>
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 12:30</div>
-                                <div class="font-bold">午餐：Bun Cha Huong Lien (歐巴馬烤肉米線)</div>
-                            </li>
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 15:00 - 17:00 (停留約 2H)</div>
-                                <div class="font-bold text-green-700">🎾 匹克球 (Pickleball) 運動</div>
-                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚕</span> 搭乘 Grab 前往當地網球/匹克球俱樂部</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Pickleball+court+Hanoi" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">📍 尋找周邊球場</a>
-                            </li>
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 19:00</div>
-                                <div class="font-bold">三十六古街夜市 / Ta Hien 啤酒街</div>
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="bg-green-50 p-4 rounded-xl shadow-sm"><p class="font-bold">大教堂與熱血打球</p><p class="text-sm text-gray-600 mt-1">參觀 St. Joseph Cathedral，下午安排當地 Pickleball 交流，晚上逛三十六古街。</p></div>
                 </div>
             </div>
-
-            <!-- Day 3 -->
-            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
+            <!-- Day 3 & 4 簡單帶過 -->
+            <div class="relative z-10 mb-8 md:flex md:justify-between items-center group">
                 <div class="hidden md:block md:w-5/12 text-right pr-8">
-                    <h3 class="text-2xl font-bold text-accent">Day 3 • 3/30 (一)</h3>
-                    <p class="text-gray-500 font-medium">下龍灣豪華郵輪 (已預訂)</p>
+                    <h3 class="text-xl font-bold text-accent">Day 3~4 • 3/30-31</h3><p class="text-gray-500 text-sm">下龍灣豪華郵輪</p>
                 </div>
                 <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-accent border-4 border-white shadow flex items-center justify-center text-white text-xs">3</div>
                 <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-accent">Day 3 • 3/30 (一)</h3>
-                        <p class="text-gray-500 font-medium">下龍灣豪華郵輪 (已預訂)</p>
-                    </div>
-                    <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-yellow-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 08:00 - 11:30</div>
-                                <div class="font-bold">搭乘郵輪接駁車前往下龍灣</div>
-                                <div class="text-sm text-gray-600 mt-1">將大件行李寄放於原飯店或攜帶上船。</div>
-                            </li>
-                            <li class="border-l-2 border-yellow-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 12:00 - 13:00</div>
-                                <div class="font-bold">抵達碼頭，辦理登船手續</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Halong+International+Cruise+Port" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 碼頭位置</a>
-                            </li>
-                            <li class="border-l-2 border-yellow-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 下午至晚上</div>
-                                <div class="font-bold">郵輪活動 (鐘乳石洞探險/獨木舟/甲板晚餐)</div>
-                                <div class="text-sm text-gray-600 mt-1">🚢 盡情享受海上豪華時光。</div>
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-xl shadow-sm"><p class="font-bold">海上奢華時光</p><p class="text-sm text-gray-600 mt-1">3/30 搭乘接駁車前往下龍灣登船，3/31 下午返回河內，入住 Dechill House。</p></div>
                 </div>
             </div>
-
-            <!-- Day 4 -->
-            <div class="relative z-10 mb-16 md:flex md:justify-between items-center flex-row-reverse group">
+            <!-- Day 5 & 6 -->
+            <div class="relative z-10 mb-8 md:flex md:justify-between items-center flex-row-reverse group">
                 <div class="hidden md:block md:w-5/12 text-left pl-8">
-                    <h3 class="text-2xl font-bold text-gray-700">Day 4 • 3/31 (二)</h3>
-                    <p class="text-gray-500 font-medium">返回河內，入住新民宿</p>
+                    <h3 class="text-xl font-bold text-secondary">Day 5~6 • 4/1-4/2</h3><p class="text-gray-500 text-sm">火車街與陸龍灣</p>
                 </div>
-                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-500 border-4 border-white shadow flex items-center justify-center text-white text-xs">4</div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-secondary border-4 border-white shadow flex items-center justify-center text-white text-xs">5</div>
                 <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-gray-700">Day 4 • 3/31 (二)</h3>
-                        <p class="text-gray-500 font-medium">返回河內，入住新民宿</p>
-                    </div>
-                    <div class="bg-gray-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-gray-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 上午</div>
-                                <div class="font-bold">郵輪太極拳活動、早午餐後下船</div>
-                            </li>
-                            <li class="border-l-2 border-gray-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 14:30</div>
-                                <div class="font-bold">返回河內，入住 Dechill House</div>
-                                <a href="https://www.google.com/maps/dir/?api=1&origin=Halong+Bay&destination=Dechill+House+Lý+Nam+Đế+Hà+Nội&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 回程導航</a>
-                            </li>
-                            <li class="border-l-2 border-gray-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 16:00 (停留約 2H)</div>
-                                <div class="font-bold">越式越式洗頭或全身按摩 (Omamori Spa)</div>
-                                <div class="text-sm text-gray-600 mt-1">洗去兩天搭船的疲勞。</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Omamori+Spa+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 尋找地圖</a>
-                            </li>
-                            <li class="border-l-2 border-gray-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 18:30</div>
-                                <div class="font-bold">晚餐：Banh Cuon Gia Truyen (越式腸粉)</div>
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="bg-green-50 p-4 rounded-xl shadow-sm"><p class="font-bold">西湖夕陽與一日遊</p><p class="text-sm text-gray-600 mt-1">4/1 河內火車街與西湖 (鎮國寺)，4/2 陸龍灣長安手搖船與臥龍山健行。</p></div>
                 </div>
             </div>
-
-            <!-- Day 5 -->
-            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
+            <!-- Day 7 & 8 -->
+            <div class="relative z-10 md:flex md:justify-between items-center group">
                 <div class="hidden md:block md:w-5/12 text-right pr-8">
-                    <h3 class="text-2xl font-bold text-primary">Day 5 • 4/1 (三)</h3>
-                    <p class="text-gray-500 font-medium">鐵道風情與西湖日落</p>
+                    <h3 class="text-xl font-bold text-gray-700">Day 7~8 • 4/3-4/4</h3><p class="text-gray-500 text-sm">PPA賽事與賦歸</p>
                 </div>
-                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-primary border-4 border-white shadow flex items-center justify-center text-white text-xs">5</div>
+                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-500 border-4 border-white shadow flex items-center justify-center text-white text-xs">7</div>
                 <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-primary">Day 5 • 4/1 (三)</h3>
-                        <p class="text-gray-500 font-medium">鐵道風情與西湖日落</p>
-                    </div>
-                    <div class="bg-indigo-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:30 (停留約 1.5H)</div>
-                                <div class="font-bold">河內火車街 (Hanoi Train Street)</div>
-                                <div class="text-sm text-gray-600 mt-1">找間鐵道旁的咖啡廳等待火車經過。</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Hanoi+Train+Street" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
-                            </li>
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 12:30</div>
-                                <div class="font-bold">午餐：Banh Mi 25 (超人氣法國麵包)</div>
-                            </li>
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 15:00 (停留約 2.5H)</div>
-                                <div class="font-bold">西湖 (Tay Ho) & 鎮國寺漫步</div>
-                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚕</span> 搭乘 Grab 前往西湖區 (約15分)</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Tran+Quoc+Pagoda+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
-                            </li>
-                            <li class="border-l-2 border-indigo-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 18:30</div>
-                                <div class="font-bold">晚餐：Cau Go Vietnamese Cuisine</div>
-                                <div class="text-sm text-gray-600 mt-1">可俯瞰還劍湖夜景的精緻餐廳。</div>
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl shadow-sm"><p class="font-bold">觀賽與回程</p><p class="text-sm text-gray-600 mt-1">4/3 觀看 PPA 比賽、晚上與球友聚餐。4/4 早上 Claire 11:30 班機 / 下午 Hiking 14:25 班機。</p></div>
                 </div>
             </div>
-
-            <!-- Day 6 -->
-            <div class="relative z-10 mb-16 md:flex md:justify-between items-center flex-row-reverse group">
-                <div class="hidden md:block md:w-5/12 text-left pl-8">
-                    <h3 class="text-2xl font-bold text-secondary">Day 6 • 4/2 (四)</h3>
-                    <p class="text-gray-500 font-medium">陸龍灣一日遊 (預計行程)</p>
-                </div>
-                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-secondary border-4 border-white shadow flex items-center justify-center text-white text-xs">6</div>
-                <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-secondary">Day 6 • 4/2 (四)</h3>
-                        <p class="text-gray-500 font-medium">陸龍灣一日遊 (預計行程)</p>
-                    </div>
-                    <div class="bg-green-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 07:30 - 10:00</div>
-                                <div class="font-bold">專車接送前往寧平 (Ninh Binh)</div>
-                                <a href="https://www.google.com/maps/dir/?api=1&origin=Dechill+House+Hanoi&destination=Trang+An+Ninh+Binh&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 乘車路線參考</a>
-                            </li>
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 10:30 (停留約 1.5H)</div>
-                                <div class="font-bold">華閭古都 (Hoa Lu) 歷史巡禮</div>
-                            </li>
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 13:30 (停留約 2H)</div>
-                                <div class="font-bold">長安 (Trang An) 手搖船秘境探險</div>
-                                <div class="text-sm text-gray-600 mt-1">🚣 穿梭於喀斯特地貌與石灰岩洞中。</div>
-                            </li>
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 16:00 (停留約 1.5H)</div>
-                                <div class="font-bold">臥龍山 (Hang Mua) 階梯健行看夕陽</div>
-                                <div class="text-sm text-gray-600 mt-1">需爬約500階，風景極佳！</div>
-                            </li>
-                            <li class="border-l-2 border-green-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 19:30</div>
-                                <div class="font-bold">返回河內市區，享用輕便晚餐 (Pho Gia Truyen Bat Dan)</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Day 7 -->
-            <div class="relative z-10 mb-16 md:flex md:justify-between items-center group">
-                <div class="hidden md:block md:w-5/12 text-right pr-8">
-                    <h3 class="text-2xl font-bold text-accent">Day 7 • 4/3 (五)</h3>
-                    <p class="text-gray-500 font-medium">PPA賽事與球友之夜</p>
-                </div>
-                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-accent border-4 border-white shadow flex items-center justify-center text-white text-xs">7</div>
-                <div class="ml-16 md:ml-0 md:w-5/12 md:pl-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-accent">Day 7 • 4/3 (五)</h3>
-                        <p class="text-gray-500 font-medium">PPA賽事與球友之夜</p>
-                    </div>
-                    <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-yellow-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 上午 (彈性行程)</div>
-                                <div class="font-bold">睡到自然醒 / 同春市場採買伴手禮</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Dong+Xuan+Market+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 景點資訊</a>
-                            </li>
-                            <li class="border-l-2 border-yellow-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 下午</div>
-                                <div class="font-bold text-primary">🎾 觀賞 PPA (Pickleball) 比賽</div>
-                                <div class="text-sm text-gray-600 mt-1">前往指定賽事場館感受熱血氛圍！</div>
-                            </li>
-                            <li class="border-l-2 border-yellow-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 19:00</div>
-                                <div class="font-bold">🍻 與匹克球球友聚餐</div>
-                                <div class="text-sm text-gray-600 mt-1">推薦前往 Quan An Ngon (越式精緻料理庭園餐廳)，適合多人聚餐。</div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=Quan+An+Ngon+Hanoi" target="_blank" class="text-secondary text-xs hover:underline inline-flex items-center mt-1">📍 餐廳資訊</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Day 8 -->
-            <div class="relative z-10 md:flex md:justify-between items-center flex-row-reverse group">
-                <div class="hidden md:block md:w-5/12 text-left pl-8">
-                    <h3 class="text-2xl font-bold text-gray-700">Day 8 • 4/4 (六)</h3>
-                    <p class="text-gray-500 font-medium">賦歸</p>
-                </div>
-                <div class="absolute left-6 md:left-1/2 -ml-3 md:-ml-4 w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-500 border-4 border-white shadow flex items-center justify-center text-white text-xs">8</div>
-                <div class="ml-16 md:ml-0 md:w-5/12 md:pr-8">
-                    <div class="md:hidden mb-4">
-                        <h3 class="text-2xl font-bold text-gray-700">Day 8 • 4/4 (六)</h3>
-                        <p class="text-gray-500 font-medium">賦歸</p>
-                    </div>
-                    <div class="bg-gray-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition">
-                        <ul class="space-y-4">
-                            <li class="border-l-2 border-gray-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 07:30</div>
-                                <div class="font-bold">民宿周邊享用最後的越式河粉</div>
-                            </li>
-                            <li class="border-l-2 border-gray-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 08:30</div>
-                                <div class="font-bold text-primary">Claire 前往機場 (11:30 班機)</div>
-                                <div class="text-sm text-gray-600 flex items-center mt-1"><span class="mr-1">🚕</span> 搭乘 Grab 前往機場</div>
-                                <a href="https://www.google.com/maps/dir/?api=1&origin=Dechill+House+Hanoi&destination=Noi+Bai+International+Airport&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 導航路線</a>
-                            </li>
-                            <li class="border-l-2 border-gray-300 pl-4">
-                                <div class="text-sm text-gray-500 flex items-center"><span class="mr-1">🕒</span> 11:20</div>
-                                <div class="font-bold text-secondary">Hiking 前往機場 (14:25 班機)</div>
-                                <div class="text-sm text-gray-600 mt-1">（Hiking 早上可多睡一會，或在咖啡廳整理照片後再出發）</div>
-                                <a href="https://www.google.com/maps/dir/?api=1&origin=Dechill+House+Hanoi&destination=Noi+Bai+International+Airport&travelmode=driving" target="_blank" class="text-primary text-xs hover:underline inline-flex items-center mt-1">🔗 導航路線</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
 
-    <!-- 美食地圖 (具備篩選功能) -->
-    <section id="food" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center"><span class="mr-3 text-3xl">🍜</span> 必吃美食地圖</h2>
+    <!-- 地點總覽地圖 (具備篩選功能與 35 張卡片) -->
+    <section id="places" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4 flex items-center"><span class="mr-3 text-3xl">📌</span> 收藏清單：美食、景點與娛樂地圖</h2>
+        <p class="text-gray-600 mb-8">收錄了您指定的 35 個精選地點。點擊卡片下方的 Google Maps 連結即可一鍵開啟導航！</p>
         
         <!-- 篩選器 -->
-        <div class="flex flex-wrap gap-2 mb-8 justify-center md:justify-start">
-            <button class="filter-btn active bg-primary text-white px-4 py-2 rounded-full text-sm font-medium transition hover:shadow-md" data-filter="all">全部美食</button>
-            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="pho">主食河粉</button>
-            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="street">街頭小吃</button>
-            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="cafe">特色咖啡</button>
-            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-4 py-2 rounded-full text-sm font-medium transition hover:bg-gray-50" data-filter="restaurant">聚餐餐廳</button>
+        <div class="flex flex-wrap gap-3 mb-10 justify-center md:justify-start">
+            <button class="filter-btn active bg-primary text-white px-5 py-2.5 rounded-full text-sm font-bold transition hover:shadow-md" data-filter="all">全部地點</button>
+            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-5 py-2.5 rounded-full text-sm font-bold transition hover:bg-gray-50" data-filter="food">🍜 美食地圖</button>
+            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-5 py-2.5 rounded-full text-sm font-bold transition hover:bg-gray-50" data-filter="attraction">📸 景點地標</button>
+            <button class="filter-btn bg-white text-gray-600 border border-gray-200 px-5 py-2.5 rounded-full text-sm font-bold transition hover:bg-gray-50" data-filter="entertainment">🎉 娛樂與購物</button>
         </div>
 
-        <!-- 美食卡片網格 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="food-gallery">
-            <!-- Item 1 -->
-            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="pho">
-                <div class="text-3xl mb-2">🍜</div>
-                <h3 class="font-bold text-lg text-gray-800">Pho Thin Bờ Hồ</h3>
-                <p class="text-sm text-gray-500 mb-3">還劍湖旁的超人氣清燉牛肉河粉老店，湯頭鮮甜不死鹹。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Pho+Thin+Bo+Ho+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+        <!-- 卡片網格 (Responsive: 1 -> 2 -> 3 -> 4 columns) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="place-gallery">
+            
+            <!-- JavaScript 會動態控制這裡的顯示 -->
+            <!-- 以下為 35 張靜態卡片 -->
+
+            <!-- 1. Tuyết Bún Chả 34 -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍢</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Tuyết Bún Chả 34</h3>
+                    <p class="text-sm text-gray-500 mb-4">評價極高的在地烤肉米線，炭烤肉片香氣四溢，道地必吃。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Tuyet+Bun+Cha+34+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
             </div>
-            <!-- Item 2 -->
-            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="street">
-                <div class="text-3xl mb-2">🥖</div>
-                <h3 class="font-bold text-lg text-gray-800">Banh Mi 25</h3>
-                <p class="text-sm text-gray-500 mb-3">觀光客必吃的法國麵包，外酥內軟，餡料豐富，且環境衛生。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Banh+Mi+25+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+
+            <!-- 2. Pho 10 Ly Quoc Su -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍜</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Pho 10 Ly Quoc Su</h3>
+                    <p class="text-sm text-gray-500 mb-4">河內超人氣排隊牛肉河粉名店，湯頭濃郁，油條沾湯是靈魂吃法。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Pho+10+Ly+Quoc+Su+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
             </div>
-            <!-- Item 3 -->
-            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="street">
-                <div class="text-3xl mb-2">🍢</div>
-                <h3 class="font-bold text-lg text-gray-800">Bun Cha Huong Lien</h3>
-                <p class="text-sm text-gray-500 mb-3">鼎鼎大名的「歐巴馬烤肉米線」，點一份歐巴馬套餐絕對過癮。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Bun+Cha+Huong+Lien+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+
+            <!-- 3. Pizza 4P’s Bao Khanh -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍕</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Pizza 4P’s Bao Khanh</h3>
+                    <p class="text-sm text-gray-500 mb-4">結合日式與義式的超人氣窯烤披薩，自家製布拉塔起司絕對是起司控最愛。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Pizza+4Ps+Bao+Khanh+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
             </div>
-            <!-- Item 4 -->
-            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="cafe">
-                <div class="text-3xl mb-2">☕</div>
-                <h3 class="font-bold text-lg text-gray-800">Cafe Giang (蛋咖啡)</h3>
-                <p class="text-sm text-gray-500 mb-3">河內蛋黃咖啡的創始店，口感像液體提拉米蘇，香濃順口。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Cafe+Giang+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+
+            <!-- 4. Bánh xèo, Nem cuốn -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🌮</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Bánh xèo, Nem cuốn</h3>
+                    <p class="text-sm text-gray-500 mb-4">外皮金黃酥脆的越式煎餅 (Bánh xèo) 與清爽無負擔的生春捲，街頭經典。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+xeo+Nem+cuon+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
             </div>
-            <!-- Item 5 -->
-            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="restaurant">
-                <div class="text-3xl mb-2">🐟</div>
-                <h3 class="font-bold text-lg text-gray-800">Cha Ca Thang Long</h3>
-                <p class="text-sm text-gray-500 mb-3">古街區著名的鱧魚鍋，將薑黃魚塊與大量蒔蘿拌炒，風味獨特。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Cha+Ca+Thang+Long+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+
+            <!-- 5. Phở Gà Nguyệt -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍜</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Phở Gà Nguyệt</h3>
+                    <p class="text-sm text-gray-500 mb-4">榮獲米其林推薦的雞肉河粉！雞肉鮮嫩多汁，有湯河粉也有乾拌可選。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Pho+Ga+Nguyet+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
             </div>
-            <!-- Item 6 -->
-            <div class="food-card bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100" data-category="restaurant">
-                <div class="text-3xl mb-2">🍽️</div>
-                <h3 class="font-bold text-lg text-gray-800">Quan An Ngon</h3>
-                <p class="text-sm text-gray-500 mb-3">庭園式餐廳，集合了越南各地的特色小吃，非常適合跟球友聚餐！</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Quan+An+Ngon+Hanoi" target="_blank" class="text-primary text-sm font-medium hover:underline flex items-center"><span class="mr-1">📍</span> Google Maps</a>
+
+            <!-- 6. Banh Mi 25 -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥖</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Banh Mi 25</h3>
+                    <p class="text-sm text-gray-500 mb-4">觀光客必訪的法國麵包名店，麵包外酥內軟，口味豐富且環境衛生乾淨。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+Mi+25+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
             </div>
+
+            <!-- 7. MẸT Vietnamese restaurant -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍲</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">MẸT Vietnamese restaurant & Vegetarian Food 1</h3>
+                    <p class="text-sm text-gray-500 mb-4">提供道地越式料理及豐富美味的素食選擇，聚餐好去處。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=MET+Vietnamese+restaurant+Vegetarian+Food+1+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 8. Trang Tien Ice cream -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍦</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Trang Tien Ice cream</h3>
+                    <p class="text-sm text-gray-500 mb-4">歷史悠久的在地冰淇淋老店 (長錢冰淇淋)，綠豆與椰奶冰棒是經典必吃。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Trang+Tien+Ice+cream+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 9. Hanoi Specialty Shrimp Cake -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍤</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Hanoi Specialty Shrimp Cake</h3>
+                    <p class="text-sm text-gray-500 mb-4">西湖周邊的特色名產炸蝦餅 (Bánh Tôm)，酥脆麵衣包裹整隻鮮蝦沾魚露吃。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+Tom+Ho+Tay+Shrimp+Cake+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 10. Bánh mì Mama -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥖</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Bánh mì Mama</h3>
+                    <p class="text-sm text-gray-500 mb-4">廣受好評的越式法國麵包專賣店，獨家醬汁配上滿滿餡料，非常夠味。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+mi+Mama+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 11. Phở Khôi Hói -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍜</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Phở Khôi Hói</h3>
+                    <p class="text-sm text-gray-500 mb-4">在地人喜愛的牛肉河粉，以醇厚的牛大骨湯頭和豐富的肉片部位選擇聞名。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Pho+Khoi+Hoi+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 12. Phở bò Cô Hoa -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍜</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Phở bò Cô Hoa</h3>
+                    <p class="text-sm text-gray-500 mb-4">隱藏版的美味牛肉河粉，肉質鮮嫩、湯頭鮮甜回甘，傳統北越風味。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Pho+bo+Co+Hoa+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 13. 鎮國寺 -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="attraction">
+                <div>
+                    <div class="text-3xl mb-3">🏛️</div>
+                    <span class="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md mb-2">景點</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">鎮國寺 (Tran Quoc Pagoda)</h3>
+                    <p class="text-sm text-gray-500 mb-4">位於西湖畔的河內最古老佛寺。風景清幽、紅色寶塔壯觀，賞夕陽絕佳點。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Tran+Quoc+Pagoda+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 14. St. Joseph Cathedral -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="attraction">
+                <div>
+                    <div class="text-3xl mb-3">⛪</div>
+                    <span class="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md mb-2">景點</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">St. Joseph Cathedral</h3>
+                    <p class="text-sm text-gray-500 mb-4">聖約瑟夫天主堂。仿巴黎聖母院的哥德式建築，河內必打卡的著名地標。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=St.+Joseph+Cathedral+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 15. Tung's Kitchen -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍽️</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Tung's Kitchen</h3>
+                    <p class="text-sm text-gray-500 mb-4">裝潢溫馨的越式精緻家常菜餐廳，服務親切，非常適合舒適地享用正餐。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Tungs+Kitchen+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 16. Coffee 74 -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">☕</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Coffee 74</h3>
+                    <p class="text-sm text-gray-500 mb-4">悠閒的街角咖啡店，適合在市區走跳中途坐下來喝杯咖啡、吹吹冷氣休息。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Coffee+74+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 17. Phở Thìn Bờ Hồ -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍜</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Phở Thìn Bờ Hồ</h3>
+                    <p class="text-sm text-gray-500 mb-4">位於還劍湖旁的清燉牛肉河粉老店，湯頭清澈鮮甜不死鹹，肉片生熟度剛好。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Pho+Thin+Bo+Ho+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 18. Bún Bò Nam Bộ Bách Phương -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥗</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Bún Bò Nam Bộ Bách Phương</h3>
+                    <p class="text-sm text-gray-500 mb-4">南方口味的烤牛肉拌米線。大量生菜、花生碎配上酸甜魚露醬汁，清爽開胃。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Bun+Bo+Nam+Bo+Bach+Phuong+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 19. Loc Tai House - Chè Lộc Tài -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍧</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Loc Tai House - Chè Lộc Tài</h3>
+                    <p class="text-sm text-gray-500 mb-4">越式傳統甜湯 (Chè) 專賣店。椰奶搭配各式豆類、仙草、粉條，清涼消暑。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Che+Loc+Tai+House+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 20. Kadupul Spa -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="entertainment">
+                <div>
+                    <div class="text-3xl mb-3">💆‍♀️</div>
+                    <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md mb-2">娛樂與購物</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Kadupul Spa</h3>
+                    <p class="text-sm text-gray-500 mb-4">古城區高評價SPA。提供越式洗頭、美睫與精油按摩，打球或逛街後的放鬆首選。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Kadupul+Spa+Hanoi+Old+Quarter" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 21. Quang Huy Gemstone -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="entertainment">
+                <div>
+                    <div class="text-3xl mb-3">💎</div>
+                    <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md mb-2">娛樂與購物</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Quang Huy Gemstone</h3>
+                    <p class="text-sm text-gray-500 mb-4">寶石與天然水晶石專賣店。若對玉石、水晶感興趣，可來此挑選特色紀念品。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Quang+Huy+Gemstone+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 22. Train street coffee -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="attraction">
+                <div>
+                    <div class="text-3xl mb-3">📸</div>
+                    <span class="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md mb-2">景點</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Train street coffee</h3>
+                    <p class="text-sm text-gray-500 mb-4">坐在鐵道旁的咖啡廳，喝咖啡的同時近距離感受火車擦身而過的震撼與刺激。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Train+street+coffee+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 23. Cung Điền Kinh Mỹ Đình -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="entertainment">
+                <div>
+                    <div class="text-3xl mb-3">🏟️</div>
+                    <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md mb-2">娛樂與購物</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Cung Điền Kinh Mỹ Đình</h3>
+                    <p class="text-sm text-gray-500 mb-4">美亭室內田徑場地 / 體育館。這可能是您們要去看 PPA 匹克球賽事的舉辦地點！</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cung+Dien+Kinh+My+Dinh+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 24. BRG Mart Lý Nam Đế -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="entertainment">
+                <div>
+                    <div class="text-3xl mb-3">🛒</div>
+                    <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md mb-2">娛樂與購物</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">BRG Mart Lý Nam Đế</h3>
+                    <p class="text-sm text-gray-500 mb-4">就在第二間住宿 (Dechill House) 附近的當地連鎖超市，買水、零食伴手禮超方便。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=BRG+Mart+Ly+Nam+De+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 25. Siêu thị FujiMart Lê Duẩn -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="entertainment">
+                <div>
+                    <div class="text-3xl mb-3">🛒</div>
+                    <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md mb-2">娛樂與購物</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Siêu thị FujiMart Lê Duẩn</h3>
+                    <p class="text-sm text-gray-500 mb-4">日系連鎖質感超市。環境明亮乾淨，商品種類齊全，有許多優質生鮮與食品。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=FujiMart+Le+Duan+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 26. Tầm vị -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥢</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Tầm vị (Tam Vi)</h3>
+                    <p class="text-sm text-gray-500 mb-4">榮獲米其林一星的北越傳統家庭菜！復古木造建築極具氛圍，建議提早訂位。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Tam+Vi+Restaurant+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 27. Thịt xiên nướng -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🍢</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Thịt xiên nướng</h3>
+                    <p class="text-sm text-gray-500 mb-4">街頭隨處可見的炭烤豬肉串，甜鹹醬汁搭配炭香，是路過絕不能錯過的平民小吃。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Thit+xien+nuong+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 28. Cafe Giảng -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">☕</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Cafe Giảng</h3>
+                    <p class="text-sm text-gray-500 mb-4">河內著名的「蛋黃咖啡」創始店。攪拌後的口感宛如液態提拉米蘇般香醇濃郁。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cafe+Giang+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 29. Pub Street -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="entertainment">
+                <div>
+                    <div class="text-3xl mb-3">🍻</div>
+                    <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md mb-2">娛樂與購物</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Pub Street (Ta Hien)</h3>
+                    <p class="text-sm text-gray-500 mb-4">大名鼎鼎的啤酒街。入夜後坐在塑膠小板凳上喝 Bia Hoi (生啤酒)，體驗熱鬧夜生活。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Ta+Hien+Beer+Street+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 30. Cong Cafe – Nha Tho -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">☕</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Cong Cafe – Nha Tho</h3>
+                    <p class="text-sm text-gray-500 mb-4">大教堂旁的分店。欣賞教堂美景的最佳位置，招牌「椰奶冰沙咖啡」必點。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cong+Cafe+Nha+Tho+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 31. Cộng Cà Phê -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">☕</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Cộng Cà Phê</h3>
+                    <p class="text-sm text-gray-500 mb-4">經典越共主題咖啡連鎖館，復古軍綠裝潢非常有特色，市區各處皆有分店。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cong+Ca+Phe+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 32. Banh Cuon Steam Pancake -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥟</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Banh Cuon Steam Pancake</h3>
+                    <p class="text-sm text-gray-500 mb-4">越式現蒸腸粉 (粉捲)，皮薄滑嫩，撒上油蔥酥搭配越南火腿與魚露沾醬，非常對味。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+Cuon+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 33. Bánh Cuốn Quang An -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥟</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Bánh Cuốn Quang An</h3>
+                    <p class="text-sm text-gray-500 mb-4">評價優良的傳統越式粉捲，內含木耳碎豬肉，是在地人最愛的道地早餐選擇。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+Cuon+Quang+An+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 34. Bánh cuốn nóng Hồng Anh -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥟</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Bánh cuốn nóng Hồng Anh</h3>
+                    <p class="text-sm text-gray-500 mb-4">現點現做的熱騰騰越式粉捲！內餡飽滿紮實，加上幾片烤肉一起吃更加豐盛。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+cuon+nong+Hong+Anh+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
+            <!-- 35. Bánh cuốn Bà Xuân -->
+            <div class="place-card flex flex-col justify-between bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition border border-gray-100" data-category="food">
+                <div>
+                    <div class="text-3xl mb-3">🥟</div>
+                    <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md mb-2">美食</span>
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-2">Bánh cuốn Bà Xuân</h3>
+                    <p class="text-sm text-gray-500 mb-4">榮獲米其林必比登推薦的越式粉捲名店。外皮Q彈晶瑩剔透，口碑極佳排隊人潮多。</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=Banh+cuon+Ba+Xuan+Hanoi" target="_blank" class="w-full text-center bg-gray-50 hover:bg-indigo-50 text-indigo-600 text-sm font-bold py-2 rounded-xl transition">📍 Google Maps</a>
+            </div>
+
         </div>
     </section>
 
@@ -538,7 +629,7 @@
                 <ul class="space-y-2 text-indigo-100 text-sm">
                     <li>• 記得提早申請越南電子簽證 (e-Visa)。</li>
                     <li>• 建議先在台灣買好 eSIM，下機馬上就能聯絡雙方。</li>
-                    <li>• 下載 Grab App 。</li>
+                    <li>• 下載 Grab App (綁定信用卡方便叫車)。</li>
                 </ul>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
@@ -584,9 +675,9 @@
                 });
             });
 
-            // 美食篩選器邏輯
+            // 地點篩選器邏輯 (All, Food, Attraction, Entertainment)
             const filterBtns = document.querySelectorAll('.filter-btn');
-            const foodCards = document.querySelectorAll('.food-card');
+            const placeCards = document.querySelectorAll('.place-card');
 
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -600,9 +691,9 @@
 
                     // 篩選卡片
                     const filterValue = btn.getAttribute('data-filter');
-                    foodCards.forEach(card => {
+                    placeCards.forEach(card => {
                         if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
-                            card.style.display = 'block';
+                            card.style.display = 'flex';
                             // 加上簡單的淡入動畫效果
                             card.animate([
                                 { opacity: 0, transform: 'scale(0.95)' },
