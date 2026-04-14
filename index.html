@@ -413,11 +413,29 @@
         let lightboxIndex = 0;
         let driveTarget = '';
 
+        // 點擊按鈕時，不再直接操作 DOM，而是改變網址的 Hash
         function switchView(view) {
+            window.location.hash = view;
+        }
+
+        // 監聽並處理 Hash 改變的事件
+        function handleHashChange() {
+            // 取得當前的 hash，如果沒有或不合法，預設改為 'map'
+            let view = window.location.hash.replace('#', '');
+            if (view !== 'map' && view !== 'diary') {
+                window.location.hash = 'map';
+                return; // 改變 hash 會再次觸發此函式，因此先 return
+            }
+            
             currentView = view;
+            
+            // 切換視圖 (View) 的顯示狀態
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${view}`).classList.add('active');
+            
+            // 切換下方導覽列 (Bottom Nav) 的 Active 狀態
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
             if(view === 'map') {
                 document.querySelector('.nav-item:nth-child(1)').classList.add('active');
                 if(map) setTimeout(() => map.invalidateSize(), 100);
@@ -427,6 +445,8 @@
                 fetchData('diary');
             }
         }
+        // 註冊 hashchange 監聽器
+        window.addEventListener('hashchange', handleHashChange);
         /**
          * 透過結構化的 type 欄位判斷是否為影片
          */
@@ -913,7 +933,11 @@
             L.Control.geocoder({ defaultMarkGeocode: false, placeholder: '搜尋...', errorMessage: 'Not Found' }).on('markgeocode', function(e) { flyToSpot(e.geocode.center.lat, e.geocode.center.lng); }).addTo(map);
             map.on('click', onMapClick);
             map.on('popupopen', function(e) { setTimeout(() => { e.popup.update(); }, 10); });
-            fetchData('map');
+            
+            // 移除原本寫死在這裡的 fetchData('map');
+            // 改呼叫 handleHashChange 來根據網址 Hash 決定要載入哪個畫面
+            handleHashChange(); 
+            
             const controls = document.getElementById('mobile-controls');
             if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
         }
@@ -951,27 +975,64 @@
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('custom-search-input');
             const resultList = document.getElementById('search-results');
+            
             searchInput.addEventListener('input', function(e) {
                 const query = e.target.value;
                 if(query.length < 2) { resultList.style.display = 'none'; return; }
                 clearTimeout(searchTimeout);
+                
                 searchTimeout = setTimeout(() => {
-                    const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?singleLine=${encodeURIComponent(query)}&countryCode=TW&f=json&outSR=4326&maxLocations=5`;
+                    const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?singleLine=${encodeURIComponent(query)}&f=json&outSR=4326&maxLocations=5&outFields=PlaceName,LongLabel`;
+                    
                     fetch(url).then(r => r.json()).then(data => {
                         resultList.innerHTML = '';
                         if (data.candidates && data.candidates.length > 0) {
                             data.candidates.forEach(result => {
-                                const li = document.createElement('li'); li.textContent = result.address;
+                                const li = document.createElement('li');
+                                const attrs = result.attributes || {};
+                                const title = attrs.PlaceName || result.address.split(',')[0];
+                                const subtitle = attrs.LongLabel || result.address;
+
+                                li.innerHTML = `
+                                    <div class="font-bold text-slate-700 truncate">${title}</div>
+                                    <div class="text-[11px] text-slate-400 mt-0.5 truncate">${subtitle}</div>
+                                `;
+                                
                                 li.onclick = () => {
-                                    flyToSpot(result.location.y, result.location.x);
-                                    if(tempSearchMarker) map.removeLayer(tempSearchMarker);
-                                    tempSearchMarker = L.marker([result.location.y, result.location.x]).addTo(map).bindPopup(`<b>${result.address}</b><br>點擊地圖其他處可新增`).openPopup();
+                                    // 1. 【關鍵修正】先關閉搜尋列表！這會觸發內部邏輯清掉"舊"的標記
                                     toggleCustomSearch();
+                                    
+                                    // 2. 這時候再建立"新"的標記，就不會被誤殺變成 null 了
+                                    tempSearchMarker = L.marker([result.location.y, result.location.x]).addTo(map);
+                                    
+                                    const safeTitle = title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                                    
+                                    const popupContent = `
+                                        <div class="text-center p-1 font-sans w-[200px]">
+                                            <b class="text-slate-700 text-base leading-tight">${title}</b><br>
+                                            <span class="text-[11px] text-slate-400 block mb-3 mt-1 line-clamp-2">${subtitle}</span>
+                                            <button onclick="openSearchSpotModal(${result.location.y}, ${result.location.x}, '${safeTitle}')"
+                                                class="w-full bg-themeMain text-white font-bold py-2 px-3 rounded-xl hover:bg-sky-500 transition shadow-md active:scale-95 text-sm">
+                                                📍 在此新增回憶
+                                            </button>
+                                        </div>
+                                    `;
+                                    tempSearchMarker.bindPopup(popupContent);
+
+                                    // 3. 確保地圖飛到該點的動畫結束後，打開氣泡
+                                    flyToSpot(result.location.y, result.location.x, () => {
+                                        // 加上安全防護，確定不是 null 才開啟
+                                        if (tempSearchMarker) {
+                                            tempSearchMarker.openPopup();
+                                        }
+                                    });
                                 };
                                 resultList.appendChild(li);
                             });
                             resultList.style.display = 'block';
-                        } else { resultList.style.display = 'none'; }
+                        } else { 
+                            resultList.style.display = 'none'; 
+                        }
                     });
                 }, 500); 
             });
@@ -1470,6 +1531,20 @@
                 if (window.innerWidth < 768) controls.style.bottom = '420px'; else controls.style.bottom = '24px';
             }
         });
+        // 給搜尋結果專用的新增按鈕函式
+        window.openSearchSpotModal = function(lat, lng, name) {
+            // 呼叫原本的新增 Modal，並傳入座標
+            openModal('add', { lat: lat, lng: lng });
+            
+            // 自動把剛剛搜尋到的地標名稱，填入表單的「Location」欄位中
+            document.getElementById('entry-name').value = name;
+            
+            // 移除地圖上暫時的搜尋大頭針
+            if(tempSearchMarker) {
+                map.removeLayer(tempSearchMarker);
+                tempSearchMarker = null;
+            }
+        };
     </script>
 </body>
 </html>
